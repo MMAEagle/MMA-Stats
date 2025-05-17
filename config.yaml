@@ -1,0 +1,15 @@
+credentials:
+  usernames:
+    MMAEagle81:
+      email: mma@eagle.com
+      name: MMA Eagle
+      password: '$2b$12$cv6IP6n5fUpi1fU7KhN3zOOfRQMSD.YPiZzP9HYDlzO8vSOsPZ9p6'  # Hashed για 'MMAEagle'
+
+cookie:
+  name: mma_app_cookie
+  key: some_random_key
+  expiry_days: 3
+
+preauthorized:
+  emails:
+    - mma@eagle.com
