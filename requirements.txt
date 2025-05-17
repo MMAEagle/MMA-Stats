@@ -1,5 +1,0 @@
-streamlit
-pandas
-openpyxl
-PyYAML
-streamlit-authenticator
