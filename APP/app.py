@@ -5,7 +5,7 @@ import pandas as pd
 st.set_page_config(page_title="MMA Stats App", layout="wide")
 
 # Ανάγνωση Excel
-excel_file = "002 Stats.xlsx"
+excel_file = "APP/002 Stats.xlsx"
 sheet = "App"
 
 custom_columns = [
