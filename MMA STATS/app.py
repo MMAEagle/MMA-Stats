@@ -1,31 +1,29 @@
 import streamlit as st
 import pandas as pd
+import yaml
 import streamlit_authenticator as stauth
+from yaml.loader import SafeLoader
 
-# ------------ AUTHENTICATION ------------
-names = ["MMA Eagle"]
-usernames = ["MMAEagle81"]
-passwords = ["MMAEagle"]
-
-hashed_passwords = stauth.Hasher(passwords).generate()
+# Φόρτωση αρχείου config
+with open("config.yaml") as file:
+    config = yaml.load(file, Loader=SafeLoader)
 
 authenticator = stauth.Authenticate(
-    names,
-    usernames,
-    hashed_passwords,
-    "mma_app",
-    "auth",
-    cookie_expiry_days=30,
+    config['credentials'],
+    config['cookie']['name'],
+    config['cookie']['key'],
+    config['cookie']['expiry_days']
 )
 
-name, authentication_status, username = authenticator.login("Login", "main")
+name, authentication_status, username = authenticator.login("Σύνδεση", "main")
 
-if authentication_status is False:
-    st.error("Μη έγκυρα στοιχεία εισόδου.")
-elif authentication_status is None:
-    st.warning("Παρακαλώ εισάγετε τα στοιχεία σας.")
+if authentication_status == False:
+    st.error("Λανθασμένο όνομα ή κωδικός")
+elif authentication_status == None:
+    st.warning("Παρακαλώ εισάγετε τα στοιχεία σας")
 elif authentication_status:
-    authenticator.logout("🔒 Αποσύνδεση", "sidebar")
+    authenticator.logout("Αποσύνδεση", "sidebar")
+    st.sidebar.success(f"Καλωσήρθες, {name} 👊")
 
     # ------------ MMA STATS APP ------------
     st.set_page_config(page_title="MMA Stats App", layout="wide")
