@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import re
 
 # Ρύθμιση σελίδας
 st.set_page_config(page_title="MMA Stats App", layout="wide")
@@ -9,20 +10,28 @@ excel_file = "APP/002 Stats.xlsx"
 sheet = "App"
 
 custom_columns = [
-    "Fighter", "Age", "Height", "Reach", "Streak",
+    "Fighter", "Age", "Height", "Reach",
     "KO Wins%", "KO Losses%", "SUB Wins%", "SUB Losses%",
-    "DEC Wins%", "DEC Losses%",
-    "Sig Strikes Landed", "Sig Strikes Absorbed",
+    "DEC Wins%", "DEC Losses%", "Sig Strikes Landed", "Sig Strikes Absorbed",
     "Head %", "Body %", "Legs %",
-    "Control Time (sec)", "Control %",
-    "Controlled Time (sec)", "Controlled %",
-    "Fight Time (sec)"
+    "Control Time (sec)", "Control %", "Controlled Time (sec)", "Controlled %",
+    "Fight Time (sec)", "Streak"
 ]
 
 df = pd.read_excel(excel_file, sheet_name=sheet, skiprows=2, header=None)
 df = df.iloc[:, :len(custom_columns)]
 df.columns = custom_columns
 df = df.dropna(subset=["Fighter"])
+
+# Ανάλυση streak
+def parse_streak(val):
+    if isinstance(val, str):
+        match = re.match(r"([WL])(\d+)", val)
+        if match:
+            return int(match.group(2)) if match.group(1) == "W" else -int(match.group(2))
+    return 0
+
+df["Win Streak Numeric"] = df["Streak"].apply(parse_streak)
 df["Fight Time (min)"] = (df["Fight Time (sec)"] / 60).round(1)
 
 percent_cols = [
@@ -92,9 +101,72 @@ if st.session_state.page == "main":
 
 # ------- ΣΥΜΠΕΡΑΣΜΑΤΑ --------
 elif st.session_state.page == "conclusion":
-    # (Ο κώδικας για τα συμπεράσματα δεν αλλάζει εδώ)
+    f1 = df[df["Fighter"] == st.session_state["f1"]].iloc[0]
+    f2 = df[df["Fighter"] == st.session_state["f2"]].iloc[0]
+
+    def conclusion_text(f1, f2):
+        def age_comment(age):
+            if age < 28: return "αρκετά νέος και σίγουρα του λείπει η εμπειρία"
+            if age >= 38: return "σίγουρα τα καλύτερά του χρόνια έχουν περάσει"
+            if age >= 36: return "πλησιάζει την κάμψη από πλευράς ηλικίας"
+            return "σε πολύ καλό ηλικιακό σημείο"
+
+        p1 = f"{f1['Fighter']} είναι {age_comment(f1['Age'])}, ενώ ο {f2['Fighter']} είναι {age_comment(f2['Age'])}."
+        height_comment = f"{f1['Fighter']} πλεονεκτεί σε ύψος." if f1['Height'] > f2['Height'] else f"{f2['Fighter']} πλεονεκτεί σε ύψος."
+        time_comment = ""
+        if f1["Fight Time (min)"] < 10 and f2["Fight Time (min)"] < 10:
+            time_comment = "Δύσκολα θα δούμε τον αγώνα να πηγαίνει στους κριτές."
+        elif f1["Fight Time (min)"] < 10:
+            time_comment = f"{f1['Fighter']} είναι πολύ επικίνδυνος και τελειώνει γρήγορα τους αγώνες."
+        elif f2["Fight Time (min)"] < 10:
+            time_comment = f"{f2['Fighter']} είναι πολύ επικίνδυνος και τελειώνει γρήγορα τους αγώνες."
+
+        striker = f1 if f1["Sig Strikes Landed"] > f2["Sig Strikes Landed"] else f2
+        striking_comment = f"Ο {striker['Fighter']} φαίνεται να υπερτερεί στο striking."
+        if striker["Sig Strikes Landed"] > 5:
+            striking_comment += " Έχει υπερβολικά καλό ρυθμό."
+        if striker["Sig Strikes Landed"] < 3:
+            striking_comment += " Είναι ξεκάθαρο ότι μειονεκτεί στο striking."
+
+        zone_comment = ""
+        for f in [f1, f2]:
+            if f["Legs %"] > 20:
+                zone_comment += f"Ο {f['Fighter']} προτιμάει leg kicks. "
+            if all(p > 15 for p in [f["Head %"], f["Body %"], f["Legs %"]]):
+                zone_comment += f"Ο {f['Fighter']} έχει ολοκληρωμένο striking. "
+
+        c_comment = ""
+        control_fav = f1 if f1["Control %"] > f2["Control %"] else f2
+        c_comment += f"{control_fav['Fighter']} κυριαρχεί στο έδαφος. "
+        controlled_less = f1 if f1["Controlled %"] < f2["Controlled %"] else f2
+        c_comment += f"{controlled_less['Fighter']} δεν αφήνει τους αντιπάλους να τον ελέγξουν. "
+
+        method_comment = ""
+        for f in [f1, f2]:
+            if f["KO Wins%"] > 50:
+                method_comment += f"Ο {f['Fighter']} είναι πολύ επικίνδυνος για νοκ άουτ. "
+            if f["SUB Wins%"] > 40:
+                method_comment += f"Ο {f['Fighter']} μπορεί να τελειώσει τον αγώνα με υποταγή ανά πάσα στιγμή. "
+            if f["DEC Wins%"] > 50:
+                method_comment += f"Ο {f['Fighter']} συνήθως πάει σε απόφαση. "
+            if f["KO Losses%"] > 50:
+                method_comment += f"Το σαγόνι του {f['Fighter']} δεν είναι το πιο δυνατό. "
+            if f["SUB Losses%"] > 40:
+                method_comment += f"Ο {f['Fighter']} έχει σοβαρή αδυναμία στο έδαφος. "
+
+        return p1 + " " + height_comment + " " + time_comment, striking_comment + " " + zone_comment, c_comment, method_comment
+
     st.title("📋 Συμπεράσματα Μαχητών")
-    # [...] (Το υπόλοιπο όπως ήδη το έχεις)
+    bp, stg, wrest, meth = conclusion_text(f1, f2)
+
+    st.markdown("### 🧠 ΒΑΣΙΚΕΣ ΠΛΗΡΟΦΟΡΙΕΣ")
+    st.write(bp)
+    st.markdown("### 🥊 STRIKING")
+    st.write(stg)
+    st.markdown("### 🤼 WRESTLING")
+    st.write(wrest)
+    st.markdown("### 🧾 Μέθοδος Νίκης")
+    st.write(meth)
 
     col1, col2 = st.columns(2)
     with col1:
@@ -112,30 +184,34 @@ elif st.session_state.page == "winner" and st.session_state["winner_ready"]:
     f1 = df[df["Fighter"] == st.session_state["f1"]].iloc[0]
     f2 = df[df["Fighter"] == st.session_state["f2"]].iloc[0]
 
-    def calc_score(f):
-        if 28 <= f["Age"] <= 36:
-            A = 5
-        elif f["Age"] < 28:
-            A = 3.5
-        elif f["Age"] <= 38:
-            A = 2.5
-        else:
-            A = 1.5
+    def calc_custom_score(f):
+        age = f["Age"]
+        if 24 <= age <= 27 or 33 <= age <= 36: E = 3.5
+        elif 28 <= age <= 32: E = 4
+        elif age in [21, 22, 23, 37]: E = 2
+        elif age in [18, 19, 20, 38]: E = 1
+        elif 39 <= age <= 40: E = -1
+        elif age >= 41: E = -2
+        else: E = 0
 
-        B = min((f["Height"] - 165) / (200 - 165) * 5, 5)
-        G = min(f["Sig Strikes Landed"] / 7 * 5, 5)
-        D = max(5 - f["Sig Strikes Absorbed"], 1)
-        E = min(f["Control %"] / 100 * 5, 5)
-        Z = max(5 - f["Controlled %"] / 100 * 5, 1)
-        H = min(f["KO Wins%"] / 100 * 5, 5)
-        Th = min(f["SUB Wins%"] / 100 * 5, 5)
-        I = min(f["DEC Wins%"] / 100 * 5, 5)
-        streak_bonus = 0.18 * f.get("Streak", 0)
+        F = max(0, (f["Height"] - 155) * 0.1 + 1 if f["Height"] >= 155 else 0)
+        G = max(0, (f["Reach"] - 155) * 0.1 + 1 if f["Reach"] >= 155 else 0)
+        A = f["Sig Strikes Landed"]
+        B = f["Sig Strikes Absorbed"]
+        C = f["Control %"] / 100
+        D = f["Controlled %"] / 100
+        H = f["Win Streak Numeric"]
+        I = f["KO Wins%"] / 100
+        J = f["KO Losses%"] / 100
+        K = f["SUB Wins%"] / 100
+        L = f["SUB Losses%"] / 100
+        M = f["DEC Wins%"] / 100
+        N = f["DEC Losses%"] / 100
 
-        return round((1.01*A + 1.2*B + 2.1*G + 2.1*D + 1.8*E + 1.8*Z + 0.33*H + 0.33*Th + 0.33*I + streak_bonus) / 5.5, 3)
+        return 2*(A - B) + 40*(C - D) + E + F + G + 0.5*H + 15*(I + K - J + L) + 10*(M - N)
 
-    score1 = calc_score(f1)
-    score2 = calc_score(f2)
+    score1 = calc_custom_score(f1)
+    score2 = calc_custom_score(f2)
 
     prob1 = round(score1 / (score1 + score2) * 100, 1)
     prob2 = round(score2 / (score1 + score2) * 100, 1)
