@@ -9,7 +9,7 @@ excel_file = "APP/002 Stats.xlsx"
 sheet = "App"
 
 custom_columns = [
-    "Fighter", "Age", "Height", "Reach",
+    "Fighter", "Age", "Height", "Reach", "Streak",
     "KO Wins%", "KO Losses%", "SUB Wins%", "SUB Losses%",
     "DEC Wins%", "DEC Losses%",
     "Sig Strikes Landed", "Sig Strikes Absorbed",
@@ -58,6 +58,7 @@ if st.session_state.page == "main":
         st.markdown(f"- 👤 Ηλικία: {fighter_data['Age']}")
         st.markdown(f"- 📏 Ύψος: {fighter_data['Height']} cm")
         st.markdown(f"- 📐 Reach: {fighter_data['Reach']} cm")
+        st.markdown(f"- 🔁 Streak: {fighter_data['Streak']}")
 
         st.markdown("**__ΣΤΑΤΙΣΤΙΚΑ KO / SUB / DEC__**")
         st.markdown(f"- 🥊 KO: {fighter_data['KO Wins%']}% νίκες / {fighter_data['KO Losses%']}% ήττες")
@@ -185,7 +186,7 @@ elif st.session_state.page == "winner" and st.session_state["winner_ready"]:
         H = 5 if f["KO Wins%"] > f2["KO Wins%"] else 4.5
         Th = 5 if f["SUB Wins%"] > f2["SUB Wins%"] else 4.5
         I = 5 if f["DEC Wins%"] > f2["DEC Wins%"] else 4.5
-        return (1.01*A + 1.2*B + 2.1*G + 2.1*D + 1.8*E + 1.8*Z + 0.33*H + 0.33*Th + 0.33*I) / 5.5
+        return (1.01*A + 1.2*B + 2.1*G + 2.1*D + 1.8*E + 1.8*Z + 0.33*H + 0.33*Th + 0.33*I + 0.18*f["Streak"]) / 5.5
 
     score1 = calc_score(f1)
     score2 = calc_score(f2)
@@ -198,7 +199,6 @@ elif st.session_state.page == "winner" and st.session_state["winner_ready"]:
     st.markdown(f"<h1 style='text-align: center;'>🏆 {winner}</h1>", unsafe_allow_html=True)
     st.markdown(f"<h4 style='text-align: center;'>({prob1}% vs {prob2}%)</h4>", unsafe_allow_html=True)
 
-    # ✅ Προσθήκη κουμπιού επιστροφής στην αρχική
     if st.button("🔙 ΕΠΙΣΤΡΟΦΗ ΣΤΗΝ ΑΡΧΙΚΗ"):
         st.session_state.page = "main"
         st.rerun()
