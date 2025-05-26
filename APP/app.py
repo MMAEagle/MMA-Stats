@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import re
 
 # Ρύθμιση σελίδας
 st.set_page_config(page_title="MMA Stats App", layout="wide")
@@ -9,20 +10,30 @@ excel_file = "APP/002 Stats.xlsx"
 sheet = "App"
 
 custom_columns = [
-    "Fighter", "Age", "Height", "Reach", "Streak",
+    "Fighter", "Age", "Height", "Reach",
     "KO Wins%", "KO Losses%", "SUB Wins%", "SUB Losses%",
-    "DEC Wins%", "DEC Losses%",
-    "Sig Strikes Landed", "Sig Strikes Absorbed",
+    "DEC Wins%", "DEC Losses%", "Sig Strikes Landed", "Sig Strikes Absorbed",
     "Head %", "Body %", "Legs %",
     "Control Time (sec)", "Control %",
     "Controlled Time (sec)", "Controlled %",
-    "Fight Time (sec)"
+    "Fight Time (sec)", "Streak"
 ]
 
 df = pd.read_excel(excel_file, sheet_name=sheet, skiprows=2, header=None)
 df = df.iloc[:, :len(custom_columns)]
 df.columns = custom_columns
 df = df.dropna(subset=["Fighter"])
+
+# Ανάλυση streak
+def parse_streak(val):
+    if isinstance(val, str):
+        match = re.match(r"([WL])(\d+)", val)
+        if match:
+            return int(match.group(2)) if match.group(1) == "W" else -int(match.group(2))
+    return 0
+
+df["Win Streak Numeric"] = df["Streak"].apply(parse_streak)
+
 df["Fight Time (min)"] = (df["Fight Time (sec)"] / 60).round(1)
 
 percent_cols = [
@@ -101,7 +112,7 @@ elif st.session_state.page == "conclusion":
             if age >= 38: return "σίγουρα τα καλύτερά του χρόνια έχουν περάσει"
             if age >= 36: return "πλησιάζει την κάμψη από πλευράς ηλικίας"
             return "σε πολύ καλό ηλικιακό σημείο"
-        
+
         p1 = f"{f1['Fighter']} είναι {age_comment(f1['Age'])}, ενώ ο {f2['Fighter']} είναι {age_comment(f2['Age'])}."
         height_comment = f"{f1['Fighter']} πλεονεκτεί σε ύψος." if f1['Height'] > f2['Height'] else f"{f2['Fighter']} πλεονεκτεί σε ύψος."
         time_comment = ""
@@ -118,8 +129,7 @@ elif st.session_state.page == "conclusion":
             striking_comment += " Έχει υπερβολικά καλό ρυθμό."
         if striker["Sig Strikes Landed"] < 3:
             striking_comment += " Είναι ξεκάθαρο ότι μειονεκτεί στο striking."
-        dist1 = [f1["Head %"], f1["Body %"], f1["Legs %"]]
-        dist2 = [f2["Head %"], f2["Body %"], f2["Legs %"]]
+
         zone_comment = ""
         for f in [f1, f2]:
             if f["Legs %"] > 20:
@@ -186,7 +196,8 @@ elif st.session_state.page == "winner" and st.session_state["winner_ready"]:
         H = 5 if f["KO Wins%"] > f2["KO Wins%"] else 4.5
         Th = 5 if f["SUB Wins%"] > f2["SUB Wins%"] else 4.5
         I = 5 if f["DEC Wins%"] > f2["DEC Wins%"] else 4.5
-        return (1.01*A + 1.2*B + 2.1*G + 2.1*D + 1.8*E + 1.8*Z + 0.33*H + 0.33*Th + 0.33*I + 0.18*f["Streak"]) / 5.5
+        S = f["Win Streak Numeric"]
+        return (1.01*A + 1.2*B + 2.1*G + 2.1*D + 1.8*E + 1.8*Z + 0.33*H + 0.33*Th + 0.33*I + 0.18*S) / 5.5
 
     score1 = calc_score(f1)
     score2 = calc_score(f2)
