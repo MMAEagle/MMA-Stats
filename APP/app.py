@@ -194,8 +194,8 @@ elif st.session_state.page == "winner" and st.session_state["winner_ready"]:
         elif age >= 41: E = -2
         else: E = 0
 
-        F = max(0, (f["Height"] - 155) * 0.1 + 1 if f["Height"] >= 155 else 0)
-        G = max(0, (f["Reach"] - 155) * 0.1 + 1 if f["Reach"] >= 155 else 0)
+        F = max(0, (f["Height"] - 155) * 0.12 + 1 if f["Height"] >= 155 else 0)
+        G = max(0, (f["Reach"] - 155) * 0.14 + 1 if f["Reach"] >= 155 else 0)
         A = f["Sig Strikes Landed"]
         B = f["Sig Strikes Absorbed"]
         C = f["Control %"] / 100
@@ -208,7 +208,7 @@ elif st.session_state.page == "winner" and st.session_state["winner_ready"]:
         M = f["DEC Wins%"] / 100
         N = f["DEC Losses%"] / 100
 
-        return 2*(A - B) + 40*(C - D) + E + F + G + 0.5*H + 15*(I + K - J + L) + 10*(M - N)
+        return 2*(1.2*A - 1.1*B) + 30*(1.5*C - 1.3*D) + E + F + G + 0.5*H + 15*(1.5*I + 0.85*K - 1.2*J - L) + 10*(1.5*M - 0.75*N)
 
     score1 = calc_custom_score(f1)
     score2 = calc_custom_score(f2)
