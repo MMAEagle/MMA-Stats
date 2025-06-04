@@ -58,12 +58,12 @@ for key in ["f1", "f2", "page", "winner_ready"]:
 if st.session_state.page == "main":
     st.title("📊 MMA Fighter Comparison Tool")
 
-    # Κουμπί Ιστορικού Προβλέψεων (πάνω δεξιά)
-top_col1, top_col2 = st.columns([8, 2])
-with top_col2:
-    if st.button("📜 Δες ιστορικό προβλέψεων"):
-        st.session_state.page = "history"
-        st.rerun()
+        # Κουμπί Ιστορικού Προβλέψεων (πάνω δεξιά)
+    top_col1, top_col2 = st.columns([8, 2])
+    with top_col2:
+        if st.button("📜 Δες ιστορικό προβλέψεων"):
+            st.session_state.page = "history"
+            st.rerun()
 #----------------------------------------------
     
     col1, col2 = st.columns(2)
