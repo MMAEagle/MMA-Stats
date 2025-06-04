@@ -334,8 +334,8 @@ elif st.session_state.page == "value":
         ev_win = calculate_ev(winner_prob / 100, odds_winner)
         ev_lose = calculate_ev(loser_prob / 100, odds_loser)
 
-        st.markdown(f"#### 🧮 Υπολογισμένο EV για {winner['Fighter']}: `{ev_win}`")
-        st.markdown(f"#### 🧮 Υπολογισμένο EV για {loser['Fighter']}: `{ev_lose}`")
+        st.markdown(f"#### 🧮 Δείκτης Value για {winner['Fighter']}: `{ev_win}`")
+        st.markdown(f"#### 🧮 Δείκτης Value για {loser['Fighter']}: `{ev_lose}`")
 
         # Προτάσεις βάσει EV
         if ev_win > ev_lose and ev_win > 0:
