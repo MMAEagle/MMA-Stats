@@ -237,3 +237,41 @@ elif st.session_state.page == "winner" and st.session_state["winner_ready"]:
     if st.button("🔙 ΕΠΙΣΤΡΟΦΗ ΣΤΗΝ ΑΡΧΙΚΗ"):
         st.session_state.page = "main"
         st.rerun()
+
+    # ------- VALUE BET --------
+elif st.session_state.page == "value":
+    f1 = df[df["Fighter"] == st.session_state["f1"]].iloc[0]
+    f2 = df[df["Fighter"] == st.session_state["f2"]].iloc[0]
+
+    score1 = calc_custom_score(f1)
+    score2 = calc_custom_score(f2)
+
+    prob1 = round(score1 / (score1 + score2) * 100, 1)
+    prob2 = round(score2 / (score1 + score2) * 100, 1)
+
+    winner = f1 if score1 > score2 else f2
+    winner_prob = prob1 if score1 > score2 else prob2
+
+    st.title("📈 Υπολογισμός Value Bet")
+    st.markdown(f"### 🏆 Επιλογή Νίκης: **{winner['Fighter']}**")
+    st.markdown(f"Πιθανότητα Νίκης: **{winner_prob}%**")
+
+    user_odds = st.number_input("🔢 Εισάγετε την απόδοση για τον νικητή", min_value=1.01, step=0.01, format="%.2f")
+
+    if st.button("📊 Υπολογισμός Value", use_container_width=True):
+        p = winner_prob / 100
+        q = 1 - p
+        K = user_odds - 1
+        L = 1
+        EV = round(p * K - q * L, 3)
+
+        st.markdown(f"### 📉 Υπολογισμένο EV: `{EV}`")
+
+        if EV > 0:
+            st.success("✅ Αξίζει σε αυτή την απόδοση!")
+        else:
+            st.error("❌ Δεν αξίζει σε αυτή την απόδοση. Πιθανόν να έχει value η επιλογή του άλλου μαχητή.")
+
+    if st.button("🔙 Επιστροφή στην αρχική"):
+        st.session_state.page = "main"
+        st.rerun()
