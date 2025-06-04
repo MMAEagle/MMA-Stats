@@ -364,29 +364,44 @@ elif st.session_state.page == "value":
 elif st.session_state.page == "history":
     st.title("📜 Ιστορικό Προβλέψεων")
 
-    # Εδώ μπορείς να προσθέσεις λίστα ή DataFrame προβλέψεων
     import os
+    import pandas as pd
 
-    # Φόρτωση όλων των αρχείων .xlsx στο φάκελο APP που είναι ιστορικά
-    history_files = [f for f in os.listdir("APP") if f.endswith(".xlsx") and f != "002 Stats.xlsx"]
-    
+    history_folder = "APP"
+    history_files = [f for f in os.listdir(history_folder) if f.endswith(".xlsx") and f != "002 Stats.xlsx"]
+
     if not history_files:
         st.info("Δεν υπάρχουν αποθηκευμένες προβλέψεις.")
     else:
-        for file in history_files:
-            with st.expander(file):
-                file_path = os.path.join("APP", file)
+        tabs = st.tabs(history_files)
+
+        for i, file in enumerate(history_files):
+            with tabs[i]:
+                file_path = os.path.join(history_folder, file)
                 try:
                     hist_df = pd.read_excel(file_path)
-                    if set(["Fighter 1", "Fighter 2", "Prediction", "Winner"]).issubset(hist_df.columns):
-                        st.dataframe(hist_df)
+                    required_cols = ["Fighter 1", "Fighter 2", "Prediction", "Winner"]
+                    if set(required_cols).issubset(hist_df.columns):
+
+                        def highlight_correct(row):
+                            color = "#d4edda" if row["Prediction"] == row["Winner"] else "#f8d7da"
+                            return [f"background-color: {color}"] * len(row)
+
+                        styled_df = hist_df.style.apply(highlight_correct, axis=1)
+                        st.markdown(f"### 📄 {file}")
+                        st.dataframe(styled_df)
+
+                        correct = (hist_df["Prediction"] == hist_df["Winner"]).sum()
+                        total = len(hist_df)
+                        accuracy = correct / total * 100 if total > 0 else 0
+                        st.markdown(f"**🎯 Ποσοστό επιτυχίας:** `{accuracy:.2f}%`")
                     else:
-                        st.warning(f"Το αρχείο '{file}' δεν έχει σωστή μορφή.")
+                        st.warning(f"Το αρχείο '{file}' δεν έχει τη σωστή μορφή.")
                 except Exception as e:
                     st.error(f"Σφάλμα στο άνοιγμα του αρχείου '{file}': {e}")
 
-    
     if st.button("🔙 Επιστροφή"):
         st.session_state.page = "main"
         st.rerun()
+
 
