@@ -246,58 +246,61 @@ elif st.session_state.page == "winner" and st.session_state["winner_ready"]:
 
    # ------- VALUE BET --------
 elif st.session_state.page == "value":
-    f1 = df[df["Fighter"] == st.session_state["f1"]].iloc[0]
-    f2 = df[df["Fighter"] == st.session_state["f2"]].iloc[0]
+    # Λήψη δεδομένων για τους μαχητές
+    fighter1 = df[df["Fighter"] == st.session_state["f1"]].iloc[0]
+    fighter2 = df[df["Fighter"] == st.session_state["f2"]].iloc[0]
 
-    score1 = calc_custom_score(f1)
-    score2 = calc_custom_score(f2)
+    # Υπολογισμός σκορ
+    score1 = calc_custom_score(fighter1)
+    score2 = calc_custom_score(fighter2)
 
-    prob1 = round(score1 / (score1 + score2) * 100, 1)
-    prob2 = round(score2 / (score1 + score2) * 100, 1)
+    # Υπολογισμός πιθανοτήτων
+    total_score = score1 + score2
+    prob1 = round(score1 / total_score * 100, 1)
+    prob2 = round(score2 / total_score * 100, 1)
 
-    winner = f1 if score1 > score2 else f2
-    loser = f2 if winner is f1 else f1
-    winner_prob = prob1 if winner is f1 else prob2
-    loser_prob = prob2 if winner is f1 else prob1
+    # Καθορισμός νικητή/ηττημένου
+    if score1 > score2:
+        winner, loser = fighter1, fighter2
+        winner_prob, loser_prob = prob1, prob2
+    else:
+        winner, loser = fighter2, fighter1
+        winner_prob, loser_prob = prob2, prob1
 
     st.title("📈 Υπολογισμός Value Bet")
-
     st.markdown(f"### 🏆 Πιθανότερος Νικητής: **{winner['Fighter']}** με {winner_prob}%")
     st.markdown(f"Αντίπαλος: **{loser['Fighter']}** με {loser_prob}%")
 
+    # Εισαγωγή αποδόσεων
     col1, col2 = st.columns(2)
-
     with col1:
         odds_winner = st.number_input(f"🔢 Απόδοση για **{winner['Fighter']}**", min_value=1.01, step=0.01, format="%.2f")
     with col2:
         odds_loser = st.number_input(f"🔢 Απόδοση για **{loser['Fighter']}**", min_value=1.01, step=0.01, format="%.2f")
 
+    # Υπολογισμός value bet
     if st.button("📊 Υπολογισμός Value", use_container_width=True):
-        # Υπολογισμός EV και για τους δύο
+
         def calculate_ev(p, odds):
-            q = 1 - p
-            K = odds - 1
-            L = 1
-            return round(p * K - q * L, 3)
+            return round(p * (odds - 1) - (1 - p), 3)
 
-        p_win = winner_prob / 100
-        p_lose = loser_prob / 100
+        ev_win = calculate_ev(winner_prob / 100, odds_winner)
+        ev_lose = calculate_ev(loser_prob / 100, odds_loser)
 
-        ev_winner = calculate_ev(p_win, odds_winner)
-        ev_loser = calculate_ev(p_lose, odds_loser)
+        st.markdown(f"#### 🧮 Υπολογισμένο EV για {winner['Fighter']}: `{ev_win}`")
+        st.markdown(f"#### 🧮 Υπολογισμένο EV για {loser['Fighter']}: `{ev_lose}`")
 
-        st.markdown(f"#### 🧮 Υπολογισμένο EV για {winner['Fighter']}: `{ev_winner}`")
-        st.markdown(f"#### 🧮 Υπολογισμένο EV για {loser['Fighter']}: `{ev_loser}`")
-
-        if ev_winner > ev_loser and ev_winner > 0:
+        # Προτάσεις βάσει EV
+        if ev_win > ev_lose and ev_win > 0:
             st.success(f"✅ Η καλύτερη επιλογή είναι ο **{winner['Fighter']}**, έχει μεγαλύτερο value.")
-        elif ev_loser > ev_winner and ev_loser > 0:
+        elif ev_lose > ev_win and ev_lose > 0:
             st.success(f"✅ Η καλύτερη επιλογή είναι ο **{loser['Fighter']}**, έχει μεγαλύτερο value.")
-        elif ev_winner < 0 and ev_loser < 0:
+        elif ev_win < 0 and ev_lose < 0:
             st.error("❌ Καμία απόδοση δεν παρουσιάζει θετικό value. Απόφυγε το στοίχημα.")
         else:
             st.info("ℹ️ Υπάρχει θετικό value αλλά όχι ξεκάθαρο πλεονέκτημα. Προσοχή στην επιλογή.")
 
+    # Επιστροφή στην αρχική σελίδα
     if st.button("🔙 Επιστροφή στην αρχική"):
         st.session_state.page = "main"
         st.rerun()
