@@ -14,7 +14,7 @@ custom_columns = [
     "KO Wins%", "KO Losses%", "SUB Wins%", "SUB Losses%",
     "DEC Wins%", "DEC Losses%", "Sig Strikes Landed", "Sig Strikes Absorbed",
     "Head %", "Body %", "Legs %",
-    "TD ACG", "TD ACC %", "TD DEF %",
+    "TD AVG", "TD ACC %", "TD DEF %",
     "Control Time (sec)", "Control %", "Controlled Time (sec)", "Controlled %",
     "Fight Time (sec)", "Streak"
 ]
