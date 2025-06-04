@@ -14,9 +14,11 @@ custom_columns = [
     "KO Wins%", "KO Losses%", "SUB Wins%", "SUB Losses%",
     "DEC Wins%", "DEC Losses%", "Sig Strikes Landed", "Sig Strikes Absorbed",
     "Head %", "Body %", "Legs %",
+    "TD ACC %", "TD DEF %",
     "Control Time (sec)", "Control %", "Controlled Time (sec)", "Controlled %",
     "Fight Time (sec)", "Streak"
 ]
+
 
 df = pd.read_excel(excel_file, sheet_name=sheet, skiprows=2, header=None)
 df = df.iloc[:, :len(custom_columns)]
@@ -78,6 +80,11 @@ if st.session_state.page == "main":
         st.markdown(f"- 🎯 Landed: {fighter_data['Sig Strikes Landed']} ανά λεπτό")
         st.markdown(f"- 🛡️ Absorbed: {fighter_data['Sig Strikes Absorbed']} ανά λεπτό")
         st.markdown(f"- 🔥 Ποσοστά στόχων: Head: {fighter_data['Head %']}% | Body: {fighter_data['Body %']}% | Legs: {fighter_data['Legs %']}%")
+
+        st.markdown("**__TAKEDOWN ΣΤΑΤΙΣΤΙΚΑ__**")
+        st.markdown(f"- 🎯 TD ACC: {fighter_data['TD ACC %']}%")
+        st.markdown(f"- 🛡️ TD DEF: {fighter_data['TD DEF %']}%")
+
 
         st.markdown("**__CONTROL STATS__**")
         st.markdown(f"- ⏱️ Control Time: {fighter_data['Control Time (sec)']} sec ({fighter_data['Control %']}%)")
