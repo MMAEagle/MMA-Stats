@@ -373,24 +373,23 @@ elif st.session_state.page == "history":
     if not history_files:
         st.info("Δεν υπάρχουν αποθηκευμένες προβλέψεις.")
     else:
-        tabs = st.tabs(history_files)
-
-        for i, file in enumerate(history_files):
-            with tabs[i]:
+        for file in history_files:
+            with st.expander(f"📄 {file}"):
                 file_path = os.path.join(history_folder, file)
                 try:
                     hist_df = pd.read_excel(file_path)
                     required_cols = ["Fighter 1", "Fighter 2", "Prediction", "Winner"]
                     if set(required_cols).issubset(hist_df.columns):
+                        
+                        # Προσθήκη στήλης με ✔️ ή ❌
+                        hist_df["✅"] = hist_df.apply(
+                            lambda row: "✔️" if row["Prediction"] == row["Winner"] else "❌", axis=1
+                        )
 
-                        def highlight_correct(row):
-                            color = "#d4edda" if row["Prediction"] == row["Winner"] else "#f8d7da"
-                            return [f"background-color: {color}"] * len(row)
+                        # Εμφάνιση πίνακα
+                        st.dataframe(hist_df)
 
-                        styled_df = hist_df.style.apply(highlight_correct, axis=1)
-                        st.markdown(f"### 📄 {file}")
-                        st.dataframe(styled_df)
-
+                        # Υπολογισμός ποσοστού επιτυχίας
                         correct = (hist_df["Prediction"] == hist_df["Winner"]).sum()
                         total = len(hist_df)
                         accuracy = correct / total * 100 if total > 0 else 0
@@ -403,5 +402,3 @@ elif st.session_state.page == "history":
     if st.button("🔙 Επιστροφή"):
         st.session_state.page = "main"
         st.rerun()
-
-
