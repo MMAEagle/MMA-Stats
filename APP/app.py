@@ -246,6 +246,37 @@ elif st.session_state.page == "winner" and st.session_state["winner_ready"]:
 
    # ------- VALUE BET --------
 elif st.session_state.page == "value":
+
+    # Ορισμός συνάρτησης score (αν δεν έχει ήδη οριστεί)
+def calc_custom_score(f):
+    age = f["Age"]
+    if 24 <= age <= 27 or 33 <= age <= 36: E = 3.5
+    elif 28 <= age <= 32: E = 4
+    elif age in [21, 22, 23, 37]: E = 2
+    elif age in [18, 19, 20, 38]: E = 1
+    elif 39 <= age <= 40: E = -1
+    elif age >= 41: E = -2
+    else: E = 0
+
+    F = max(0, (f["Height"] - 155) * 0.12 + 1 if f["Height"] >= 155 else 0)
+    G = max(0, (f["Reach"] - 155) * 0.14 + 1 if f["Reach"] >= 155 else 0)
+    A = f["Sig Strikes Landed"]
+    B = f["Sig Strikes Absorbed"]
+    C = f["Control %"] / 100
+    D = f["Controlled %"] / 100
+    H = f["Win Streak Numeric"]
+    I = f["KO Wins%"] / 100
+    J = f["KO Losses%"] / 100
+    K = f["SUB Wins%"] / 100
+    L = f["SUB Losses%"] / 100
+    M = f["DEC Wins%"] / 100
+    N = f["DEC Losses%"] / 100
+    O = f["TD ACC %"] / 100
+    P = f["TD DEF %"] / 100
+    Q = f["TD AVG"]
+
+    return 10*(1.2*A - 0.9*B) + 30*(1.5*C - 1.3*D) + 0.65*(E + F + G) + 2*H + 15*(1.5*I + 0.85*K - 1.2*J - L) + 10*(1.5*M - 0.75*N)+ 10*Q*(1.25*O + 0.8*P)
+
     # Λήψη δεδομένων για τους μαχητές
     fighter1 = df[df["Fighter"] == st.session_state["f1"]].iloc[0]
     fighter2 = df[df["Fighter"] == st.session_state["f2"]].iloc[0]
