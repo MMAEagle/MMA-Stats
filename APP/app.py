@@ -221,7 +221,7 @@ elif st.session_state.page == "winner" and st.session_state["winner_ready"]:
         Q = f["TD AVG"]
 
 
-        return 10*(1.2*A - 0.9*B) + 30*(1.5*C - 1.3*D) + 0.35*(E + F + G) + 0.5*H + 15*(1.5*I + 0.85*K - 1.2*J - L) + 10*(1.5*M - 0.75*N)+ 10*Q*(1.25*O + 0.8*P)
+        return 10*(1.2*A - 0.9*B) + 30*(1.5*C - 1.3*D) + 0.65*(E + F + G) + 2*H + 15*(1.5*I + 0.85*K - 1.2*J - L) + 10*(1.5*M - 0.75*N)+ 10*Q*(1.25*O + 0.8*P)
 
     score1 = calc_custom_score(f1)
     score2 = calc_custom_score(f2)
