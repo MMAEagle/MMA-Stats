@@ -365,7 +365,26 @@ elif st.session_state.page == "history":
     st.title("📜 Ιστορικό Προβλέψεων")
 
     # Εδώ μπορείς να προσθέσεις λίστα ή DataFrame προβλέψεων
-    st.info("Δεν υπάρχουν ακόμα αποθηκευμένες προβλέψεις.")
+    import os
+
+    # Φόρτωση όλων των αρχείων .xlsx στο φάκελο APP που είναι ιστορικά
+    history_files = [f for f in os.listdir("APP") if f.endswith(".xlsx") and f != "002 Stats.xlsx"]
+    
+    if not history_files:
+        st.info("Δεν υπάρχουν αποθηκευμένες προβλέψεις.")
+    else:
+        for file in history_files:
+            with st.expander(file):
+                file_path = os.path.join("APP", file)
+                try:
+                    hist_df = pd.read_excel(file_path)
+                    if set(["Fighter 1", "Fighter 2", "Prediction", "Winner"]).issubset(hist_df.columns):
+                        st.dataframe(hist_df)
+                    else:
+                        st.warning(f"Το αρχείο '{file}' δεν έχει σωστή μορφή.")
+                except Exception as e:
+                    st.error(f"Σφάλμα στο άνοιγμα του αρχείου '{file}': {e}")
+
     
     if st.button("🔙 Επιστροφή"):
         st.session_state.page = "main"
