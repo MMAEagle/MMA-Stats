@@ -39,8 +39,9 @@ df["Fight Time (min)"] = (df["Fight Time (sec)"] / 60).round(1)
 percent_cols = [
     "KO Wins%", "KO Losses%", "SUB Wins%", "SUB Losses%",
     "DEC Wins%", "DEC Losses%", "Head %", "Body %", "Legs %",
-    "Control %", "Controlled %"
+    "Control %", "Controlled %", "TD ACC %", "TD DEF %"
 ]
+
 
 for col in percent_cols:
     df[col] = (df[col] * 100).round(1)
