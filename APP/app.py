@@ -214,8 +214,10 @@ elif st.session_state.page == "winner" and st.session_state["winner_ready"]:
         L = f["SUB Losses%"] / 100
         M = f["DEC Wins%"] / 100
         N = f["DEC Losses%"] / 100
+        O = f["TD ACC"] / 100
+        P = f["TD DEF"] / 100
 
-        return 2*(1.2*A - 1.1*B) + 30*(1.5*C - 1.3*D) + E + F + G + 0.5*H + 15*(1.5*I + 0.85*K - 1.2*J - L) + 10*(1.5*M - 0.75*N)
+        return 2*(1.2*A - 1.1*B + 1.2*O - 0.8*P) + 30*(1.5*C - 1.3*D) + E + F + G + 0.5*H + 15*(1.5*I + 0.85*K - 1.2*J - L) + 10*(1.5*M - 0.75*N)
 
     score1 = calc_custom_score(f1)
     score2 = calc_custom_score(f2)
