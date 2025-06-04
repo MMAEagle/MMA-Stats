@@ -239,8 +239,9 @@ elif st.session_state.page == "winner" and st.session_state["winner_ready"]:
         st.rerun()
 
     if st.button("📈 Υπολογισμός Value"):
-        st.session_state.page = "value_bet"
+        st.session_state.page = "value"
         st.rerun()
+
 
 
    # ------- VALUE BET --------
