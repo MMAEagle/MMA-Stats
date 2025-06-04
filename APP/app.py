@@ -14,7 +14,7 @@ custom_columns = [
     "KO Wins%", "KO Losses%", "SUB Wins%", "SUB Losses%",
     "DEC Wins%", "DEC Losses%", "Sig Strikes Landed", "Sig Strikes Absorbed",
     "Head %", "Body %", "Legs %",
-    "TD ACC %", "TD DEF %",
+    "TD ACG", "TD ACC %", "TD DEF %",
     "Control Time (sec)", "Control %", "Controlled Time (sec)", "Controlled %",
     "Fight Time (sec)", "Streak"
 ]
@@ -82,6 +82,7 @@ if st.session_state.page == "main":
         st.markdown(f"- 🔥 Ποσοστά στόχων: Head: {fighter_data['Head %']}% | Body: {fighter_data['Body %']}% | Legs: {fighter_data['Legs %']}%")
 
         st.markdown("**__TAKEDOWN ΣΤΑΤΙΣΤΙΚΑ__**")
+        st.markdown(f"- 🎯 TD AVG: {fighter_data['TD AVG']} per 15 min")
         st.markdown(f"- 🎯 TD ACC: {fighter_data['TD ACC %']}%")
         st.markdown(f"- 🛡️ TD DEF: {fighter_data['TD DEF %']}%")
 
@@ -216,9 +217,10 @@ elif st.session_state.page == "winner" and st.session_state["winner_ready"]:
         N = f["DEC Losses%"] / 100
         O = f["TD ACC %"] / 100
         P = f["TD DEF %"] / 100
+        Q = f["TD AVG"]
 
 
-        return 2*(1.2*A - 1.1*B) + 30*(1.5*C - 1.3*D) + E + F + G + 0.5*H + 15*(1.5*I + 0.85*K - 1.2*J - L) + 10*(1.5*M - 0.75*N)+20*(1.25*O - 0.8*P)
+        return 2*(1.2*A - 1.1*B) + 30*(1.5*C - 1.3*D) + E + F + G + 0.5*H + 15*(1.5*I + 0.85*K - 1.2*J - L) + 10*(1.5*M - 0.75*N)+ 20*Q*(1.25*O - 0.8*P)
 
     score1 = calc_custom_score(f1)
     score2 = calc_custom_score(f2)
