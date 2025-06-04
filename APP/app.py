@@ -57,6 +57,14 @@ for key in ["f1", "f2", "page", "winner_ready"]:
 # ------- ΚΥΡΙΑ ΣΕΛΙΔΑ --------
 if st.session_state.page == "main":
     st.title("📊 MMA Fighter Comparison Tool")
+
+    # Κουμπί Ιστορικού Προβλέψεων (πάνω δεξιά)
+top_col1, top_col2 = st.columns([8, 2])
+with top_col2:
+    if st.button("📜 Δες ιστορικό προβλέψεων"):
+        st.session_state.page = "history"
+        st.rerun()
+#----------------------------------------------
     
     col1, col2 = st.columns(2)
     with col1:
@@ -351,3 +359,15 @@ elif st.session_state.page == "value":
     if st.button("🔙 Επιστροφή στην αρχική"):
         st.session_state.page = "main"
         st.rerun()
+
+# ------- ΙΣΤΟΡΙΚΟ ΠΡΟΒΛΕΨΕΩΝ --------
+elif st.session_state.page == "history":
+    st.title("📜 Ιστορικό Προβλέψεων")
+
+    # Εδώ μπορείς να προσθέσεις λίστα ή DataFrame προβλέψεων
+    st.info("Δεν υπάρχουν ακόμα αποθηκευμένες προβλέψεις.")
+    
+    if st.button("🔙 Επιστροφή"):
+        st.session_state.page = "main"
+        st.rerun()
+
