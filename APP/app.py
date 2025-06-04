@@ -2,6 +2,14 @@ import streamlit as st
 import pandas as pd
 import re
 
+# Διαβάζουμε την κάρτα αγώνων
+card_file = "APP/ufc_card.xlsx"
+card_df = pd.read_excel(card_file)
+
+# Αναμένουμε η κάρτα να έχει στήλες όπως: ['Fighter1', 'Fighter2']
+card_df.dropna(subset=["Fighter 1", "Fighter 2"], inplace=True)
+
+
 # Ρύθμιση σελίδας
 st.set_page_config(page_title="MMA Stats App", layout="wide")
 
@@ -57,7 +65,22 @@ for key in ["f1", "f2", "page", "winner_ready"]:
 # ------- ΚΥΡΙΑ ΣΕΛΙΔΑ --------
 if st.session_state.page == "main":
     st.title("📊 MMA Fighter Comparison Tool")
+# ------- Επιλογή Αγώνα από Κάρτα UFC --------
+st.markdown("### 📋 Επιλογή Αγώνα από Κάρτα UFC")
 
+fight_selection = st.selectbox(
+    "Επιλέξτε ζευγάρι αγώνα", 
+    options=[f"{row['Fighter 1']} vs {row['Fighter 2']}" for _, row in card_df.iterrows()], 
+    index=None,
+    placeholder="🔍 Επιλέξτε αγώνα (προαιρετικά)"
+)
+
+if fight_selection:
+    f1_name, f2_name = fight_selection.split(" vs ")
+    st.session_state.f1 = f1_name.strip()
+    st.session_state.f2 = f2_name.strip()
+
+    
     col1, col2 = st.columns(2)
     with col1:
         st.session_state.f1 = st.selectbox("🔎 Επιλογή Μαχητή 1", df["Fighter"], key="fighter1")
