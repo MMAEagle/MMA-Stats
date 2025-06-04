@@ -238,6 +238,11 @@ elif st.session_state.page == "winner" and st.session_state["winner_ready"]:
         st.session_state.page = "main"
         st.rerun()
 
+    if st.button("📈 Υπολογισμός Value"):
+    st.session_state.page = "value_bet"
+    st.rerun()
+
+
    # ------- VALUE BET --------
 elif st.session_state.page == "value":
     f1 = df[df["Fighter"] == st.session_state["f1"]].iloc[0]
