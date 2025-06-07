@@ -117,9 +117,9 @@ if st.session_state.page == "main":
         st.rerun()
 
     if st.button("Εξαγωγή νικητή ➤"):
-    st.session_state.skip_to_results = True
-    st.session_state.page = "Αποτελέσματα"
-    st.experimental_rerun()
+        st.session_state.skip_to_results = True
+        st.session_state.page = "Αποτελέσματα"
+        st.experimental_rerun()
 
 
 # ------- ΣΥΜΠΕΡΑΣΜΑΤΑ --------
