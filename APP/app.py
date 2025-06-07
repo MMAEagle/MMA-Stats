@@ -116,6 +116,12 @@ if st.session_state.page == "main":
         st.session_state.page = "conclusion"
         st.rerun()
 
+    if st.button("Εξαγωγή νικητή ➤"):
+    st.session_state.skip_to_results = True
+    st.session_state.page = "Αποτελέσματα"
+    st.experimental_rerun()
+
+
 # ------- ΣΥΜΠΕΡΑΣΜΑΤΑ --------
 elif st.session_state.page == "conclusion":
     f1 = df[df["Fighter"] == st.session_state["f1"]].iloc[0]
