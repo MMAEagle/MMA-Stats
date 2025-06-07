@@ -54,6 +54,16 @@ for key in ["f1", "f2", "page", "winner_ready"]:
     if key not in st.session_state:
         st.session_state[key] = None if key != "page" else "main"
 
+if "multi_fights" not in st.session_state:
+    st.session_state.multi_fights = []
+
+if "parlay_probs" not in st.session_state:
+    st.session_state.parlay_probs = []
+
+if "current_pair" not in st.session_state:
+    st.session_state.current_pair = {"f1": None, "f2": None}
+
+
 # ------- ΚΥΡΙΑ ΣΕΛΙΔΑ --------
 if st.session_state.page == "main":
     st.title("📊 MMA Fighter Comparison Tool")
@@ -248,6 +258,18 @@ elif st.session_state.page == "winner" and st.session_state["winner_ready"]:
     st.markdown(f"<h1 style='text-align: center;'>🏆 {winner}</h1>", unsafe_allow_html=True)
     st.markdown(f"<h4 style='text-align: center;'>({prob1}% vs {prob2}%)</h4>", unsafe_allow_html=True)
 
+    if len(st.session_state.multi_fights) < 5:
+    if st.button("📌 Πρόσθεσε και άλλο fight"):
+        st.session_state.multi_fights.append({
+            "f1": st.session_state["f1"],
+            "f2": st.session_state["f2"],
+            "winner": winner,
+            "prob": prob1 if winner == f1["Fighter"] else prob2
+        })
+        st.session_state.page = "multi_fight"
+        st.rerun()
+
+
     if st.button("🔙 ΕΠΙΣΤΡΟΦΗ ΣΤΗΝ ΑΡΧΙΚΗ"):
         st.session_state.page = "main"
         st.rerun()
@@ -256,6 +278,57 @@ elif st.session_state.page == "winner" and st.session_state["winner_ready"]:
         st.session_state.page = "value"
         st.rerun()
 
+#-------Παρολι--------
+elif st.session_state.page == "multi_fight":
+    st.title("📋 Νέο Fight για Παρολί")
+
+    col1, col2 = st.columns(2)
+    with col1:
+        st.session_state.current_pair["f1"] = st.selectbox("🧍 Μαχητής 1", df["Fighter"], key="mf_f1")
+    with col2:
+        st.session_state.current_pair["f2"] = st.selectbox("🧍 Μαχητής 2", df["Fighter"], key="mf_f2")
+
+    if st.session_state.current_pair["f1"] == st.session_state.current_pair["f2"]:
+    st.warning("⚠️ Οι δύο μαχητές πρέπει να είναι διαφορετικοί.")
+    else:
+
+    if st.button("🏆 Εξαγωγή Νικητή"):
+        f1 = df[df["Fighter"] == st.session_state.current_pair["f1"]].iloc[0]
+        f2 = df[df["Fighter"] == st.session_state.current_pair["f2"]].iloc[0]
+        score1 = calc_custom_score(f1)
+        score2 = calc_custom_score(f2)
+        prob1 = round(score1 / (score1 + score2) * 100, 1)
+        prob2 = round(score2 / (score1 + score2) * 100, 1)
+        winner = f1["Fighter"] if score1 > score2 else f2["Fighter"]
+        prob = prob1 if winner == f1["Fighter"] else prob2
+
+        st.session_state.multi_fights.append({
+            "f1": f1["Fighter"],
+            "f2": f2["Fighter"],
+            "winner": winner,
+            "prob": prob
+        })
+
+        st.success(f"✅ Προστέθηκε: {winner} ({prob}%)")
+
+    if st.session_state.multi_fights:
+        st.markdown("### 🧾 Προβλέψεις Παρολί")
+        total_prob = 1
+        for idx, fight in enumerate(st.session_state.multi_fights, 1):
+            st.markdown(f"**{idx}. {fight['f1']} vs {fight['f2']} → 🏆 {fight['winner']} ({fight['prob']}%)**")
+            total_prob *= (fight["prob"] / 100)
+
+        st.markdown(f"## 🔢 Συνολικό Παρολί: **{round(total_prob * 100, 2)}%**")
+
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("🔙 Επιστροφή στην αρχική"):
+            st.session_state.page = "main"
+            st.rerun()
+    with col2:
+        if st.button("🧹 Καθαρισμός Παρολί"):
+            st.session_state.multi_fights = []
+            st.rerun()
 
 
    # ------- VALUE BET --------
