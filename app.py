@@ -6,7 +6,6 @@ import re
 st.set_page_config(page_title="MMA Stats App", layout="wide")
 
 # -------------------- 🔐 ΕΛΕΓΧΟΣ ΠΡΟΣΒΑΣΗΣ --------------------
-st.set_page_config(page_title="MMA Stats App", layout="wide")
 
 st.title("🔒 MMA Stats App - Έλεγχος Πρόσβασης")
 
