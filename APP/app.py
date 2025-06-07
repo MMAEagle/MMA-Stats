@@ -310,6 +310,11 @@ elif st.session_state.page == "multi_fight":
     if st.session_state.current_pair["f1"] == st.session_state.current_pair["f2"]:
         st.warning("⚠️ Οι δύο μαχητές πρέπει να είναι διαφορετικοί.")
     else:
+        winner_manual = st.selectbox(
+            "🏆 Επιλέξτε νικητή", 
+            [st.session_state.current_pair["f1"], st.session_state.current_pair["f2"]],
+            key="mf_winner_manual"
+        )
         if st.button("🧾 ΠΡΟΣΘΗΚΗ ΣΤΟ ΠΑΡΟΛΙ"):
             f1 = df[df["Fighter"] == st.session_state.current_pair["f1"]].iloc[0]
             f2 = df[df["Fighter"] == st.session_state.current_pair["f2"]].iloc[0]
