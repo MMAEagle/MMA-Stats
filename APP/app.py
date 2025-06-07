@@ -322,7 +322,7 @@ elif st.session_state.page == "multi_fight":
             score2 = calc_custom_score(f2)
             prob1 = round(score1 / (score1 + score2) * 100, 1)
             prob2 = round(score2 / (score1 + score2) * 100, 1)
-            winner = f1["Fighter"] if score1 > score2 else f2["Fighter"]
+            winner = winner_manual
             prob = prob1 if winner == f1["Fighter"] else prob2
     
             st.session_state.multi_fights.append({
