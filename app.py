@@ -535,7 +535,7 @@ elif st.session_state.page == "history":
     import pandas as pd
 
     history_folder = "APP"
-    history_files = [f for f in os.listdir(history_folder) if f.endswith(".xlsx") and f != "002 Stats.xlsx"]
+    history_files = [f for f in os.listdir(history_folder) if f.endswith(".xlsx") and f != "002 Stats.xlsx" != "002 Stats demo.xlsx"]
 
     if not history_files:
         st.info("Δεν υπάρχουν αποθηκευμένες προβλέψεις.")
