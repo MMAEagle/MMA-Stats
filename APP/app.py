@@ -118,7 +118,7 @@ if st.session_state.page == "main":
 
     if st.button("🏆 ΕΞΑΓΩΓΗ ΝΙΚΗΤΗ", use_container_width=True):
         st.session_state.skip_to_results = True
-        st.session_state.page = "Αποτελέσματα"
+        st.session_state.page = "winner"
         st.rerun()
 
 # ------- ΣΥΜΠΕΡΑΣΜΑΤΑ --------
