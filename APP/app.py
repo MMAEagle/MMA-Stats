@@ -359,13 +359,6 @@ elif st.session_state.page == "multi_fight":
         </div>
         """, unsafe_allow_html=True)
 
-        '>
-            <p style='font-size: 18px; margin: 0;'><strong>🔢 Συνολικό Παρολί:</strong> {total_prob_percent}%</p>
-            <p style='font-size: 16px; margin: 5px 0 0;'>🧮 Value αν απόδοση &gt; <strong>{fair_odds}</strong></p>
-        </div>
-        """, unsafe_allow_html=True)
-
-
 
     col1, col2 = st.columns(2)
     with col1:
