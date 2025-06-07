@@ -259,15 +259,15 @@ elif st.session_state.page == "winner" and st.session_state["winner_ready"]:
     st.markdown(f"<h4 style='text-align: center;'>({prob1}% vs {prob2}%)</h4>", unsafe_allow_html=True)
 
     if len(st.session_state.multi_fights) < 5:
-    if st.button("📌 Πρόσθεσε και άλλο fight"):
-        st.session_state.multi_fights.append({
-            "f1": st.session_state["f1"],
-            "f2": st.session_state["f2"],
-            "winner": winner,
-            "prob": prob1 if winner == f1["Fighter"] else prob2
-        })
-        st.session_state.page = "multi_fight"
-        st.rerun()
+        if st.button("📌 Πρόσθεσε και άλλο fight"):
+            st.session_state.multi_fights.append({
+                "f1": st.session_state["f1"],
+                "f2": st.session_state["f2"],
+                "winner": winner,
+                "prob": prob1 if winner == f1["Fighter"] else prob2
+            })
+            st.session_state.page = "multi_fight"
+            st.rerun()
 
 
     if st.button("🔙 ΕΠΙΣΤΡΟΦΗ ΣΤΗΝ ΑΡΧΙΚΗ"):
