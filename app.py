@@ -13,7 +13,7 @@ access_code = st.text_input("Εισάγετε κωδικό για πρόσβασ
 
 if access_code == "mmaeagle":
     st.info("Είσαι στη demo έκδοση της εφαρμογής.")
-    excel_file = "APP/002 Stats demo.xlsx"  # 👉 Τοποθέτησε εδώ το demo αρχείο σου
+    excel_file = "APP/002 Stats demo.xlsx"  # 👉 Demo αρχείο
 elif access_code == "oliakosgamietai":
     st.success("Πρόσβαση επιτυχής: Κανονική έκδοση.")
     excel_file = "APP/002 Stats.xlsx"
@@ -22,10 +22,10 @@ else:
     st.stop()
 # --------------------------------------------------------------
 
-
 # Ανάγνωση Excel
-excel_file = "APP/002 Stats.xlsx"
+# ⚠️ ΜΗΝ ξαναορίζεις το excel_file!
 sheet = "App"
+
 
 custom_columns = [
     "Fighter", "Age", "Height", "Reach",
