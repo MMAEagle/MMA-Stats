@@ -154,25 +154,33 @@ if st.session_state.page == "main":
 
     st.title("📊 MMA Fighter Comparison Tool")
 
+    help_col1, help_col2 = st.columns([10, 1])
+    with help_col2:
+        if st.button("❓", help="Οδηγίες Χρήσης", key="help_btn"):
+            st.session_state.show_help = not st.session_state.get("show_help", False)
+
+
     if st.session_state.get("show_help", False):
         st.markdown("""
-            <div class="modal">
-                <span class="close-button" onclick="document.dispatchEvent(new Event('close-help'))">✖</span>
-                <h3>📘 Οδηγίες Χρήσης</h3>
-                <p>1. Επίλεξε δύο μαχητές για σύγκριση.</p>
-                <p>2. Δες στατιστικά, ποσοστά και άλλες λεπτομέρειες.</p>
-                <p>3. Χρησιμοποίησε τα κουμπιά για προβλέψεις ή δημιουργία παρολί.</p>
-                <p>4. Μπορείς να δεις το ιστορικό ή να εξάγεις συμπεράσματα.</p>
-            </div>
-            <script>
-                const closeEvent = () => {
-                    document.addEventListener("close-help", () => {
-                        window.parent.postMessage({ isStreamlitMessage: true, type: "streamlit:setComponentValue", value: false, key: "show_help" }, "*");
-                    });
-                };
-                closeEvent();
-            </script>
+        <div style='
+            background-color: #1e1e1e;
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+            margin-top: 10px;
+            border: 1px solid #555;
+        '>
+            <h4>📘 Οδηγίες Χρήσης</h4>
+            <ul>
+                <li>Επίλεξε δύο μαχητές από τα dropdown μενού.</li>
+                <li>Δες συγκριτικά στατιστικά και λεπτομέρειες για τον κάθε μαχητή.</li>
+                <li>Πάτησε <b>🏆 ΕΞΑΓΩΓΗ ΝΙΚΗΤΗ</b> για αυτόματη πρόβλεψη νικητή.</li>
+                <li>Μπορείς να αποθηκεύσεις την πρόβλεψη ή να δημιουργήσεις παρολί.</li>
+                <li>Χρησιμοποίησε το μενού πάνω δεξιά για να δεις ιστορικό ή συμπεράσματα.</li>
+            </ul>
+        </div>
         """, unsafe_allow_html=True)
+
 
 
         # Κουμπί Ιστορικού Προβλέψεων (πάνω δεξιά)
