@@ -289,7 +289,7 @@ elif st.session_state.page == "winner" and st.session_state["winner_ready"]:
     st.markdown(f"<h4 style='text-align: center;'>({prob1}% vs {prob2}%)</h4>", unsafe_allow_html=True)
 
     if len(st.session_state.multi_fights) < 5:
-        if st.button("📌 Πρόσθεσε και άλλο fight"):
+        if st.button("Εξαγωγή Νικητή"):
             st.session_state.multi_fights.append({
                 "f1": st.session_state["f1"],
                 "f2": st.session_state["f2"],
@@ -321,7 +321,7 @@ elif st.session_state.page == "multi_fight":
     if st.session_state.current_pair["f1"] == st.session_state.current_pair["f2"]:
         st.warning("⚠️ Οι δύο μαχητές πρέπει να είναι διαφορετικοί.")
     else:
-        if st.button("🏆 Εξαγωγή Νικητή"):
+        if st.button("🧾 ΠΡΟΣΘΗΚΗ ΣΤΟ ΠΑΡΟΛΙ"):
             f1 = df[df["Fighter"] == st.session_state.current_pair["f1"]].iloc[0]
             f2 = df[df["Fighter"] == st.session_state.current_pair["f2"]].iloc[0]
             score1 = calc_custom_score(f1)
