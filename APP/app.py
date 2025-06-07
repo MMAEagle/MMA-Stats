@@ -219,68 +219,95 @@ elif st.session_state.page == "conclusion":
     f2 = df[df["Fighter"] == st.session_state["f2"]].iloc[0]
 
     def conclusion_text(f1, f2):
-        def age_comment(age):
-            if age < 28: return "αρκετά νέος και σίγουρα του λείπει η εμπειρία"
-            if age >= 38: return "σίγουρα τα καλύτερά του χρόνια έχουν περάσει"
-            if age >= 36: return "πλησιάζει την κάμψη από πλευράς ηλικίας"
-            return "σε πολύ καλό ηλικιακό σημείο"
+        def age_comment(f1, f2):
+            comments = []
+            def single_age(f):
+                if f["Age"] < 28: return "⚠️ αρκετά νέος και ίσως του λείπει εμπειρία"
+                if f["Age"] >= 38: return "❌ μάλλον έχει αφήσει πίσω τα καλύτερά του χρόνια"
+                if f["Age"] >= 36: return "⚠️ βρίσκεται κοντά στην ηλικιακή κάμψη"
+                return "✅ είναι σε πολύ καλό ηλικιακό σημείο"
+            comments.append(f"- {f1['Fighter']}: {single_age(f1)}")
+            comments.append(f"- {f2['Fighter']}: {single_age(f2)}")
+            return comments
 
-        p1 = f"{f1['Fighter']} είναι {age_comment(f1['Age'])}, ενώ ο {f2['Fighter']} είναι {age_comment(f2['Age'])}."
-        height_comment = f"{f1['Fighter']} πλεονεκτεί σε ύψος." if f1['Height'] > f2['Height'] else f"{f2['Fighter']} πλεονεκτεί σε ύψος."
-        time_comment = ""
-        if f1["Fight Time (min)"] < 10 and f2["Fight Time (min)"] < 10:
-            time_comment = "Δύσκολα θα δούμε τον αγώνα να πηγαίνει στους κριτές."
-        elif f1["Fight Time (min)"] < 10:
-            time_comment = f"{f1['Fighter']} είναι πολύ επικίνδυνος και τελειώνει γρήγορα τους αγώνες."
-        elif f2["Fight Time (min)"] < 10:
-            time_comment = f"{f2['Fighter']} είναι πολύ επικίνδυνος και τελειώνει γρήγορα τους αγώνες."
+        def height_comment(f1, f2):
+            if f1["Height"] > f2["Height"]:
+                return [f"📏 ✅ {f1['Fighter']} έχει σαφές πλεονέκτημα ύψους."]
+            elif f2["Height"] > f1["Height"]:
+                return [f"📏 ✅ {f2['Fighter']} είναι ψηλότερος και μπορεί να ελέγχει την απόσταση."]
+            return []
 
-        striker = f1 if f1["Sig Strikes Landed"] > f2["Sig Strikes Landed"] else f2
-        striking_comment = f"Ο {striker['Fighter']} φαίνεται να υπερτερεί στο striking."
-        if striker["Sig Strikes Landed"] > 5:
-            striking_comment += " Έχει υπερβολικά καλό ρυθμό."
-        if striker["Sig Strikes Landed"] < 3:
-            striking_comment += " Είναι ξεκάθαρο ότι μειονεκτεί στο striking."
+        def time_comment(f1, f2):
+            if f1["Fight Time (min)"] < 10 and f2["Fight Time (min)"] < 10:
+                return ["⏱️ ⚠️ Και οι δύο τελειώνουν γρήγορα τους αγώνες – πιθανό να μη φτάσει η μάχη στους κριτές."]
+            elif f1["Fight Time (min)"] < 10:
+                return [f"⏱️ ✅ Ο {f1['Fighter']} έχει επιθετικό στυλ και συνήθως τελειώνει νωρίς."]
+            elif f2["Fight Time (min)"] < 10:
+                return [f"⏱️ ✅ Ο {f2['Fighter']} δύσκολα αφήνει τον αγώνα να τραβήξει σε διάρκεια."]
+            return []
 
-        zone_comment = ""
-        for f in [f1, f2]:
-            if f["Legs %"] > 20:
-                zone_comment += f"Ο {f['Fighter']} προτιμάει leg kicks. "
-            if all(p > 15 for p in [f["Head %"], f["Body %"], f["Legs %"]]):
-                zone_comment += f"Ο {f['Fighter']} έχει ολοκληρωμένο striking. "
+        def striking_comment(f1, f2):
+            striker = f1 if f1["Sig Strikes Landed"] > f2["Sig Strikes Landed"] else f2
+            other = f2 if striker is f1 else f1
+            comments = [f"🥊 ✅ {striker['Fighter']} δείχνει να υπερτερεί στο striking απέναντι στον {other['Fighter']}."]
+            if striker["Sig Strikes Landed"] > 5:
+                comments.append("⚡ Πολύ καλός ρυθμός χτυπημάτων.")
+            if striker["Sig Strikes Landed"] < 3:
+                comments.append("❌ Ο ρυθμός του είναι σχετικά χαμηλός.")
+            return comments
 
-        c_comment = ""
-        control_fav = f1 if f1["Control %"] > f2["Control %"] else f2
-        c_comment += f"{control_fav['Fighter']} κυριαρχεί στο έδαφος. "
-        controlled_less = f1 if f1["Controlled %"] < f2["Controlled %"] else f2
-        c_comment += f"{controlled_less['Fighter']} δεν αφήνει τους αντιπάλους να τον ελέγξουν. "
+        def zone_comment(f1, f2):
+            comments = []
+            for f in [f1, f2]:
+                if f["Legs %"] > 20:
+                    comments.append(f"🦵 ⚠️ Ο {f['Fighter']} στοχεύει συχνά στα πόδια.")
+                if all(p > 15 for p in [f["Head %"], f["Body %"], f["Legs %"]]):
+                    comments.append(f"🎯 ✅ Ο {f['Fighter']} έχει ποικιλία στο striking του.")
+            return comments
 
-        method_comment = ""
-        for f in [f1, f2]:
-            if f["KO Wins%"] > 50:
-                method_comment += f"Ο {f['Fighter']} είναι πολύ επικίνδυνος για νοκ άουτ. "
-            if f["SUB Wins%"] > 40:
-                method_comment += f"Ο {f['Fighter']} μπορεί να τελειώσει τον αγώνα με υποταγή ανά πάσα στιγμή. "
-            if f["DEC Wins%"] > 50:
-                method_comment += f"Ο {f['Fighter']} συνήθως πάει σε απόφαση. "
-            if f["KO Losses%"] > 50:
-                method_comment += f"Το σαγόνι του {f['Fighter']} δεν είναι το πιο δυνατό. "
-            if f["SUB Losses%"] > 40:
-                method_comment += f"Ο {f['Fighter']} έχει σοβαρή αδυναμία στο έδαφος. "
+        def control_comment(f1, f2):
+            comments = []
+            if f1["Control %"] != f2["Control %"]:
+                control_fav = f1 if f1["Control %"] > f2["Control %"] else f2
+                comments.append(f"🤼 ✅ Ο {control_fav['Fighter']} έχει περισσότερο έλεγχο στο έδαφος.")
+            if f1["Controlled %"] != f2["Controlled %"]:
+                controlled_less = f1 if f1["Controlled %"] < f2["Controlled %"] else f2
+                comments.append(f"🛡️ ✅ Ο {controlled_less['Fighter']} αποφεύγει να ελέγχεται από τον αντίπαλο.")
+            return comments
 
-        return p1 + " " + height_comment + " " + time_comment, striking_comment + " " + zone_comment, c_comment, method_comment
+        def method_comment(f1, f2):
+            comments = []
+            for f in [f1, f2]:
+                if f["KO Wins%"] > 50:
+                    comments.append(f"🥊 ✅ Ο {f['Fighter']} τελειώνει πολλούς αγώνες με νοκ άουτ.")
+                if f["SUB Wins%"] > 40:
+                    comments.append(f"🤼‍♂️ ✅ Ο {f['Fighter']} είναι επικίνδυνος με υποταγές.")
+                if f["DEC Wins%"] > 50:
+                    comments.append(f"🧾 ⚠️ Ο {f['Fighter']} συχνά κερδίζει μέσω απόφασης.")
+                if f["KO Losses%"] > 50:
+                    comments.append(f"💥 ❌ Ο {f['Fighter']} έχει δεχτεί αρκετά νοκ άουτ στο παρελθόν.")
+                if f["SUB Losses%"] > 40:
+                    comments.append(f"⚠️ ❌ Ο {f['Fighter']} δείχνει αδυναμία στο έδαφος.")
+            return comments
+
+        return (
+            age_comment(f1, f2) + height_comment(f1, f2) + time_comment(f1, f2),
+            striking_comment(f1, f2) + zone_comment(f1, f2),
+            control_comment(f1, f2),
+            method_comment(f1, f2)
+        )
 
     st.title("📋 Συμπεράσματα Μαχητών")
     bp, stg, wrest, meth = conclusion_text(f1, f2)
 
     st.markdown("### 🧠 ΒΑΣΙΚΕΣ ΠΛΗΡΟΦΟΡΙΕΣ")
-    st.write(bp)
+    st.markdown("\n".join(bp))
     st.markdown("### 🥊 STRIKING")
-    st.write(stg)
+    st.markdown("\n".join(stg))
     st.markdown("### 🤼 WRESTLING")
-    st.write(wrest)
+    st.markdown("\n".join(wrest))
     st.markdown("### 🧾 Μέθοδος Νίκης")
-    st.write(meth)
+    st.markdown("\n".join(meth))
 
     col1, col2 = st.columns(2)
     with col1:
