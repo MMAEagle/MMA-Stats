@@ -96,7 +96,84 @@ if "current_pair" not in st.session_state:
 
 # ------- ΚΥΡΙΑ ΣΕΛΙΔΑ --------
 if st.session_state.page == "main":
+    if "show_help" not in st.session_state:
+        st.session_state.show_help = False
+
+    st.markdown("""
+        <style>
+        .help-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #444;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 38px;
+            height: 38px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .help-button:hover {
+            background-color: #666;
+        }
+        .modal {
+            position: fixed;
+            top: 50%%;
+            left: 50%%;
+            transform: translate(-50%%, -50%%);
+            background-color: #222;
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            z-index: 9999;
+            max-width: 600px;
+            box-shadow: 0 0 10px #000;
+        }
+        .close-button {
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        </style>
+    
+        <button class="help-button" onclick="document.dispatchEvent(new Event('open-help'))">❓</button>
+        <script>
+            const streamlitEvents = () => {
+                document.addEventListener("open-help", () => {
+                    window.parent.postMessage({ isStreamlitMessage: true, type: "streamlit:setComponentValue", value: true, key: "show_help" }, "*");
+                });
+            };
+            streamlitEvents();
+        </script>
+    """, unsafe_allow_html=True)
+
     st.title("📊 MMA Fighter Comparison Tool")
+
+    if st.session_state.get("show_help", False):
+        st.markdown("""
+            <div class="modal">
+                <span class="close-button" onclick="document.dispatchEvent(new Event('close-help'))">✖</span>
+                <h3>📘 Οδηγίες Χρήσης</h3>
+                <p>1. Επίλεξε δύο μαχητές για σύγκριση.</p>
+                <p>2. Δες στατιστικά, ποσοστά και άλλες λεπτομέρειες.</p>
+                <p>3. Χρησιμοποίησε τα κουμπιά για προβλέψεις ή δημιουργία παρολί.</p>
+                <p>4. Μπορείς να δεις το ιστορικό ή να εξάγεις συμπεράσματα.</p>
+            </div>
+            <script>
+                const closeEvent = () => {
+                    document.addEventListener("close-help", () => {
+                        window.parent.postMessage({ isStreamlitMessage: true, type: "streamlit:setComponentValue", value: false, key: "show_help" }, "*");
+                    });
+                };
+                closeEvent();
+            </script>
+        """, unsafe_allow_html=True)
+
 
         # Κουμπί Ιστορικού Προβλέψεων (πάνω δεξιά)
     top_col1, top_col2 = st.columns([8, 2])
