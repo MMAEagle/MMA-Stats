@@ -151,11 +151,7 @@ if st.session_state.page == "main":
         show_stats(f1_data)
     with col2:
         show_stats(f2_data)
-
-    if st.button("ΕΞΑΓΩΓΗ ΣΥΜΠΕΡΑΣΜΑΤΩΝ", use_container_width=True):
-        st.session_state.page = "conclusion"
-        st.rerun()
-
+    
     if st.button("🏆 ΕΞΑΓΩΓΗ ΝΙΚΗΤΗ", use_container_width=True):
         st.session_state.winner_ready = True
         st.session_state.page = "winner"
@@ -179,7 +175,10 @@ if st.session_state.page == "main":
         })
         st.session_state.page = "multi_fight"
         st.rerun()
-
+        
+    if st.button("ΕΞΑΓΩΓΗ ΣΥΜΠΕΡΑΣΜΑΤΩΝ", use_container_width=True):
+        st.session_state.page = "conclusion"
+        st.rerun()
 
 # ------- ΣΥΜΠΕΡΑΣΜΑΤΑ --------
 elif st.session_state.page == "conclusion":
