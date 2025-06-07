@@ -288,10 +288,9 @@ elif st.session_state.page == "multi_fight":
     with col2:
         st.session_state.current_pair["f2"] = st.selectbox("🧍 Μαχητής 2", df["Fighter"], key="mf_f2")
 
-    if st.session_state.current_pair["f1"] == st.session_state.current_pair["f2"]:
-        st.warning("⚠️ Οι δύο μαχητές πρέπει να είναι διαφορετικοί.")
-    else:
-
+   if st.session_state.current_pair["f1"] == st.session_state.current_pair["f2"]:
+    st.warning("⚠️ Οι δύο μαχητές πρέπει να είναι διαφορετικοί.")
+else:
     if st.button("🏆 Εξαγωγή Νικητή"):
         f1 = df[df["Fighter"] == st.session_state.current_pair["f1"]].iloc[0]
         f2 = df[df["Fighter"] == st.session_state.current_pair["f2"]].iloc[0]
@@ -310,6 +309,7 @@ elif st.session_state.page == "multi_fight":
         })
 
         st.success(f"✅ Προστέθηκε: {winner} ({prob}%)")
+
 
     if st.session_state.multi_fights:
         st.markdown("### 🧾 Προβλέψεις Παρολί")
