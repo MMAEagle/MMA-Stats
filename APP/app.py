@@ -347,11 +347,18 @@ elif st.session_state.page == "multi_fight":
         
         st.markdown(f"""
         <div style='
-            border: 1px solid #CCC;
+            background-color: #1e1e1e;
+            color: #f0f0f0;
+            border: 1px solid #444;
             border-radius: 10px;
             padding: 15px;
-            margin-top: 15px;
-            background-color: #f9f9f9;
+            margin-top: 20px;
+        '>
+            <p style='font-size: 18px; margin: 0;'><strong>🔢 Συνολικό Παρολί:</strong> {total_prob_percent}%</p>
+            <p style='font-size: 16px; margin: 8px 0 0;'>🎯 Value αν απόδοση &gt; <strong>{fair_odds}</strong></p>
+        </div>
+        """, unsafe_allow_html=True)
+
         '>
             <p style='font-size: 18px; margin: 0;'><strong>🔢 Συνολικό Παρολί:</strong> {total_prob_percent}%</p>
             <p style='font-size: 16px; margin: 5px 0 0;'>🧮 Value αν απόδοση &gt; <strong>{fair_odds}</strong></p>
