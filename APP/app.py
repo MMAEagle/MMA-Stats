@@ -345,10 +345,19 @@ elif st.session_state.page == "multi_fight":
         total_prob_percent = round(total_prob * 100, 2)
         fair_odds = round(100 / total_prob_percent, 2)
         
-        st.markdown(f'## 🔢 Συνολικό Παρολί: **{total_prob_percent}%** ' +
-            f'<span title="Αν η απόδοση του παρολί είναι μεγαλύτερη από αυτήν, θεωρείται ότι έχει value.">🧮</span>' +
-            f' → Value για απόδοση μεγαλύτερη από: **{fair_odds}**',
-            unsafe_allow_html=True)
+        st.markdown(f"""
+        <div style='
+            border: 1px solid #CCC;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            background-color: #f9f9f9;
+        '>
+            <p style='font-size: 18px; margin: 0;'><strong>🔢 Συνολικό Παρολί:</strong> {total_prob_percent}%</p>
+            <p style='font-size: 16px; margin: 5px 0 0;'>🧮 Value αν απόδοση &gt; <strong>{fair_odds}</strong></p>
+        </div>
+        """, unsafe_allow_html=True)
+
 
 
     col1, col2 = st.columns(2)
