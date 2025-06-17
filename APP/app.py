@@ -27,6 +27,40 @@ df = df.iloc[:, :len(custom_columns)]
 df.columns = custom_columns
 df = df.dropna(subset=["Fighter"])
 
+def calculate_finish_scores(f):
+    mma_wins = f["MMA WINS"]
+    mma_losses = f["MMA LOSSES"]
+    ufc_wins = f["UFC WINS"]
+    ufc_losses = f["UFC LOSSES"]
+    
+    ko_wins_pct = f["KO Wins%"] / 100
+    ko_losses_pct = f["KO Losses%"] / 100
+    sub_wins_pct = f["SUB Wins%"] / 100
+    sub_losses_pct = f["SUB Losses%"] / 100
+
+    # Avoid division by zero
+    win_denom = 0.37 * (mma_wins - ufc_wins) + 0.63 * ufc_wins
+    loss_denom = 0.45 * (mma_losses - ufc_losses) + 0.55 * ufc_losses
+
+    ko_win_score = ko_wins_pct * ((0.37 * (mma_wins - ufc_wins) + 0.63 * (ufc_wins - 0.5)) / win_denom) if win_denom else 0
+    ko_loss_score = ko_losses_pct * ((0.45 * (mma_losses - ufc_losses) + 0.55 * (ufc_losses + 0.5)) / loss_denom) if loss_denom else 0
+
+    sub_win_score = sub_wins_pct * ((0.37 * (mma_wins - ufc_wins) + 0.63 * (ufc_wins - 0.5)) / win_denom) if win_denom else 0
+    sub_loss_score = sub_losses_pct * ((0.45 * (mma_losses - ufc_losses) + 0.55 * (ufc_losses + 0.5)) / loss_denom) if loss_denom else 0
+
+    dec_win_score = 1 - ko_win_score - sub_win_score
+    dec_loss_score = 1 - ko_loss_score - sub_loss_score
+
+    return {
+        "KO Win Score": ko_win_score,
+        "KO Loss Score": ko_loss_score,
+        "SUB Win Score": sub_win_score,
+        "SUB Loss Score": sub_loss_score,
+        "DEC Win Score": dec_win_score,
+        "DEC Loss Score": dec_loss_score
+    }
+
+
 def calc_custom_score(f):
         age = f["Age"]
         if 24 <= age <= 27 or 33 <= age <= 36: E = 3.5
@@ -195,6 +229,10 @@ if st.session_state.page == "main":
     if st.button("🏆 ΕΞΑΓΩΓΗ ΝΙΚΗΤΗ", use_container_width=True):
         st.session_state.winner_ready = True
         st.session_state.page = "winner"
+        st.rerun()
+
+    if st.button("📊 ΤΡΟΠΟΣ ΕΚΒΑΣΗΣ", use_container_width=True):
+        st.session_state.page = "outcome"
         st.rerun()
         
     if st.button("➕ ΔΗΜΙΟΥΡΓΙΑ ΠΑΡΟΛΙ", use_container_width=True):
@@ -558,3 +596,42 @@ elif st.session_state.page == "history":
     if st.button("🔙 Επιστροφή"):
         st.session_state.page = "main"
         st.rerun()
+
+#----------------ΤΡΟΠΟΣ ΕΚΒΑΣΗΣ--------------
+
+elif st.session_state["page"] == "outcome":
+    st.title("🔎 Τρόπος Εκβασης Fight")
+
+    f1 = st.session_state["f1"]
+    f2 = st.session_state["f2"]
+
+    if f1 is None or f2 is None:
+        st.warning("Επίλεξε δύο μαχητές πρώτα.")
+    else:
+        # Πάρε τα δεδομένα των μαχητών
+        fighter1 = df[df["Fighter"] == f1].iloc[0]
+        fighter2 = df[df["Fighter"] == f2].iloc[0]
+
+        # Custom Scores
+        cs1 = calc_custom_score(fighter1)
+        cs2 = calc_custom_score(fighter2)
+
+        # Finish-related scores
+        finish_scores1 = calculate_finish_scores(fighter1)
+        finish_scores2 = calculate_finish_scores(fighter2)
+
+        f1_score = finish_scores1["KO Win Score"] + finish_scores1["SUB Win Score"] + finish_scores1["KO Loss Score"] + finish_scores1["SUB Loss Score"]
+        f2_score = finish_scores2["KO Win Score"] + finish_scores2["SUB Win Score"] + finish_scores2["KO Loss Score"] + finish_scores2["SUB Loss Score"]
+
+        # Υπολογισμός πιθανότητας
+        finish_prop = 0.25 * cs1 * f1_score + 0.25 * cs2 * f2_score
+        finish_prop = min(max(finish_prop, 0), 1)  # Clamp μεταξύ 0-1
+        dec_prop = 1 - finish_prop
+
+        # Εμφάνιση
+        st.markdown("### 🎯 **Πιθανότητες Τρόπου Εκβασης**")
+        st.markdown(f"🧠 **To Fight να μην πάει σε απόφαση**: `{round(finish_prop*100, 1)}%`")
+        st.markdown(f"📜 **Το Fight να πάει σε απόφαση**: `{round(dec_prop*100, 1)}%`")
+
+        st.markdown("---")
+        st.button("🔙 Επιστροφή", on_click=lambda: st.session_state.update({"page": "main"}))
