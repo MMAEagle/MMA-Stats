@@ -154,7 +154,7 @@ if st.session_state.page == "main":
         st.markdown(f"- 📐 Reach: {fighter_data['Reach']} cm")
         st.markdown(f"- 🔁 Streak: {fighter_data['Streak']}")
 
-        st.markdown(f"- 🧾 **UFC Record**: {int(fighter_data['UFC WINS'])} - {int(fighter_data['UFC LOSSES'])}")
+        st.markdown(f"- 🧾 **UFC Record**: ✅{int(fighter_data['UFC WINS'])} - ❌{int(fighter_data['UFC LOSSES'])}")
         st.markdown(f"- ✅ UFC Wins: {int(fighter_data['UFC WINS'])}")
         st.markdown(f"- ❌ UFC Losses: {int(fighter_data['UFC LOSSES'])}")
 
