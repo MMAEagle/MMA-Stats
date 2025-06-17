@@ -11,6 +11,7 @@ sheet = "App"
 
 custom_columns = [
     "Fighter", "Age", "Height", "Reach",
+    "UFC Wins", "UFC Losses",
     "KO Wins%", "KO Losses%", "SUB Wins%", "SUB Losses%",
     "DEC Wins%", "DEC Losses%", "Sig Strikes Landed", "Sig Strikes Absorbed",
     "Head %", "Body %", "Legs %",
@@ -152,6 +153,11 @@ if st.session_state.page == "main":
         st.markdown(f"- 📏 Ύψος: {fighter_data['Height']} cm")
         st.markdown(f"- 📐 Reach: {fighter_data['Reach']} cm")
         st.markdown(f"- 🔁 Streak: {fighter_data['Streak']}")
+
+        st.markdown(f"- 🧾 **UFC Record**: {fighter_data['UFC Wins']} - {fighter_data['UFC Losses']}")
+        st.markdown(f"   - ✅ UFC Wins: {fighter_data['UFC Wins']}")
+        st.markdown(f"   - ❌ UFC Losses: {fighter_data['UFC Losses']}")
+
 
         st.markdown("**__ΣΤΑΤΙΣΤΙΚΑ KO / SUB / DEC__**")
         st.markdown(f"- 🥊 KO: {fighter_data['KO Wins%']}% νίκες / {fighter_data['KO Losses%']}% ήττες")
