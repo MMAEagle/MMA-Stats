@@ -597,7 +597,7 @@ elif st.session_state.page == "history":
         st.session_state.page = "main"
         st.rerun()
 
-#----------------ΤΡΟΠΟΣ ΕΚΒΑΣΗΣ--------------
+# ----------------ΤΡΟΠΟΣ ΕΚΒΑΣΗΣ--------------
 
 elif st.session_state["page"] == "outcome":
     st.title("🔎 Τρόπος Εκβασης Fight")
@@ -611,36 +611,40 @@ elif st.session_state["page"] == "outcome":
         fighter1 = df[df["Fighter"] == f1].iloc[0]
         fighter2 = df[df["Fighter"] == f2].iloc[0]
 
-        score1 = calc_custom_score(fighter1)
-        score2 = calc_custom_score(fighter2)
+        cs1 = calc_custom_score(fighter1)
+        cs2 = calc_custom_score(fighter2)
 
-        P1_win = score1 / (score1 + score2)
-        P2_win = score2 / (score1 + score2)
+        finish_scores1 = calculate_finish_scores(fighter1)
+        finish_scores2 = calculate_finish_scores(fighter2)
 
-        fs1 = calculate_finish_scores(fighter1)
-        fs2 = calculate_finish_scores(fighter2)
+        # Πιθανοτητες εκβασης με βαση και τους 2 μαχητες
+        P_KO = (cs1 * finish_scores1["KO Win Score"] + cs2 * finish_scores2["KO Win Score"]) / (cs1 + cs2)
+        P_SUB = (cs1 * finish_scores1["SUB Win Score"] + cs2 * finish_scores2["SUB Win Score"]) / (cs1 + cs2)
+        P_DEC = 1 - P_KO - P_SUB
 
-        # Normalize win methods
-        total_win1 = fs1["KO Win Score"] + fs1["SUB Win Score"] + fs1["DEC Win Score"]
-        total_win2 = fs2["KO Win Score"] + fs2["SUB Win Score"] + fs2["DEC Win Score"]
+        st.markdown("### 🎯 <b>Αναλυτικές Πιθανότητες Τρόπου Εκβασης</b>", unsafe_allow_html=True)
+        st.markdown(f"<h4>🥊 KO/TKO: <b>{round(P_KO*100, 1)}%</b></h4>", unsafe_allow_html=True)
+        st.markdown(f"<h4>🤼‍♂️ Υποταγή: <b>{round(P_SUB*100, 1)}%</b></h4>", unsafe_allow_html=True)
+        st.markdown(f"<h4>📜 Απόφαση: <b>{round(P_DEC*100, 1)}%</b></h4>", unsafe_allow_html=True)
 
-        p1_KO = fs1["KO Win Score"] / total_win1 if total_win1 else 0
-        p1_SUB = fs1["SUB Win Score"] / total_win1 if total_win1 else 0
-        p1_DEC = fs1["DEC Win Score"] / total_win1 if total_win1 else 0
+        # ΝΕΟ ΚΟΥΜΠΙ ΓΙΑ VALUE
+        with st.expander("📊 Value αποδόσεις"):
+            if P_KO + P_SUB > 0:
+                val_finish_odds = round(1 / (P_KO + P_SUB), 2)
+            else:
+                val_finish_odds = "—"
 
-        p2_KO = fs2["KO Win Score"] / total_win2 if total_win2 else 0
-        p2_SUB = fs2["SUB Win Score"] / total_win2 if total_win2 else 0
-        p2_DEC = fs2["DEC Win Score"] / total_win2 if total_win2 else 0
+            if P_DEC > 0:
+                val_decision_odds = round(1 / P_DEC, 2)
+            else:
+                val_decision_odds = "—"
 
-        # Overall outcome probabilities
-        P_KO = P1_win * p1_KO + P2_win * p2_KO
-        P_SUB = P1_win * p1_SUB + P2_win * p2_SUB
-        P_DEC = P1_win * p1_DEC + P2_win * p2_DEC
-
-        st.markdown("### 🎯 **Πιθανότητες Τρόπου Εκβασης**")
-        st.markdown(f"🥊 **KO/TKO**: `{round(P_KO*100, 1)}%`")
-        st.markdown(f"🤼‍♂️ **Υποταγή**: `{round(P_SUB*100, 1)}%`")
-        st.markdown(f"📜 **Απόφαση**: `{round(P_DEC*100, 1)}%`")
+            st.markdown(f"""
+            <p style='font-size:17px;'>
+            ✅ Ο αγώνας να <b>μην πάει σε απόφαση</b> αξίζει για απόδοση μεγαλύτερη του: <b>{val_finish_odds}</b><br>
+            ✅ Ο αγώνας να <b>πάει σε απόφαση</b> αξίζει για απόδοση μεγαλύτερη του: <b>{val_decision_odds}</b>
+            </p>
+            """, unsafe_allow_html=True)
 
         st.markdown("---")
         st.button("🔙 Επιστροφή", on_click=lambda: st.session_state.update({"page": "main"}))
