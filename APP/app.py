@@ -457,6 +457,9 @@ elif st.session_state.page == "winner" and st.session_state["winner_ready"]:
         st.markdown(f"### 📊 Πιθανότητα για **{selected_fighter}** να νικήσει με **{method}**: ")
         st.markdown(f"<h2 style='text-align: center; color: green;'>{round(result_prob * 100, 2)}%</h2>", unsafe_allow_html=True)
 
+    
+    col1, col2 = st.columns(2)
+
     with col1:
         st.session_state.current_pair["f1"] = st.selectbox("🧍 Μαχητής 1", df["Fighter"], key="mf_f1")
     with col2:
