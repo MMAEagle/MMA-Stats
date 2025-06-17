@@ -11,7 +11,7 @@ sheet = "App"
 
 custom_columns = [
     "Fighter", "Age", "Height", "Reach",
-    "UFC Wins", "UFC Losses",
+    "UFC WINS", "UFC LOSSES",
     "KO Wins%", "KO Losses%", "SUB Wins%", "SUB Losses%",
     "DEC Wins%", "DEC Losses%", "Sig Strikes Landed", "Sig Strikes Absorbed",
     "Head %", "Body %", "Legs %",
