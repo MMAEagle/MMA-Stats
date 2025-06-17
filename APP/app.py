@@ -43,10 +43,10 @@ def calculate_finish_scores(f):
     loss_denom = 0.45 * (mma_losses - ufc_losses) + 0.55 * ufc_losses
 
     ko_win_score = ko_wins_pct * ((0.37 * (mma_wins - ufc_wins) + 0.63 * (ufc_wins - 0.5)) / win_denom) if win_denom else 0
-    ko_loss_score = ko_losses_pct * ((0.45 * (mma_losses - ufc_losses) + 0.55 * (ufc_losses + 0.5)) / loss_denom) if loss_denom else 0
+    ko_loss_score = ko_losses_pct * ((0.45 * (mma_losses - ufc_losses) + 0.55 * (ufc_losses - 0.15)) / loss_denom) if loss_denom else 0
 
     sub_win_score = sub_wins_pct * ((0.37 * (mma_wins - ufc_wins) + 0.63 * (ufc_wins - 0.5)) / win_denom) if win_denom else 0
-    sub_loss_score = sub_losses_pct * ((0.45 * (mma_losses - ufc_losses) + 0.55 * (ufc_losses + 0.5)) / loss_denom) if loss_denom else 0
+    sub_loss_score = sub_losses_pct * ((0.45 * (mma_losses - ufc_losses) + 0.55 * (ufc_losses - 0.15)) / loss_denom) if loss_denom else 0
 
     dec_win_score = 1 - ko_win_score - sub_win_score
     dec_loss_score = 1 - ko_loss_score - sub_loss_score
