@@ -413,9 +413,6 @@ elif st.session_state.page == "winner" and st.session_state["winner_ready"]:
         st.session_state.page = "value"
         st.rerun()
 
-    if st.button("🔙 Επιστροφή στην αρχική"):
-        st.session_state.page = "main"
-        st.rerun()
 
     # ➕ Συνδυασμός Νικητή και Μεθόδου
     with st.expander("🎯 Συνδυασμός Νικητή και Μεθόδου"):
@@ -451,9 +448,26 @@ elif st.session_state.page == "winner" and st.session_state["winner_ready"]:
 
         st.markdown("---")
         st.markdown(f"### 📊 Πιθανότητα για **{selected_fighter}** να νικήσει με **{method}**:")
+        
+        # Προβολή πιθανότητας
         st.markdown(f"<h2 style='text-align: center; color: green;'>{round(result_prob * 100, 2)}%</h2>", unsafe_allow_html=True)
+        
+        # Υπολογισμός ελάχιστης value απόδοσης (αν > 0)
+        min_odds = 1 / result_prob if result_prob > 0 else float("inf")
+        
+        # Προβολή ελάχιστης value απόδοσης με αχνό γκρι κείμενο
+        st.markdown(
+            f"<p style='text-align: center; color: grey; font-size: 0.9em;'>"
+            f"(💡 Ελάχιστη value απόδοση: <b>{round(min_odds, 2)}</b>)"
+            f"</p>", 
+            unsafe_allow_html=True
+        )
 
 
+
+    if st.button("🔙 Επιστροφή στην αρχική"):
+        st.session_state.page = "main"
+        st.rerun()
 
 
    # ------- VALUE BET --------
