@@ -617,8 +617,12 @@ elif st.session_state["page"] == "outcome":
         finish_scores1 = calculate_finish_scores(fighter1)
         finish_scores2 = calculate_finish_scores(fighter2)
 
-        P_KO = (cs1 * finish_scores1["KO Win Score"] + cs2 * finish_scores2["KO Win Score"]) / (cs1 + cs2)
-        P_SUB = (cs1 * finish_scores1["SUB Win Score"] + cs2 * finish_scores2["SUB Win Score"]) / (cs1 + cs2)
+        P_KO = (cs1 * (0.5 * finish_scores1["KO Win Score"] + 0.5 * finish_scores2["KO Loss Score"]) + 
+                cs2 * (0.5 * finish_scores2["KO Win Score"] + 0.5 * finish_scores1["KO Loss Score"])) / (cs1 + cs2)
+
+        P_SUB = (cs1 * (0.5 * finish_scores1["SUB Win Score"] + 0.5 * finish_scores2["SUB Loss Score"]) + 
+                 cs2 * (0.5 * finish_scores2["SUB Win Score"] + 0.5 * finish_scores1["SUB Loss Score"])) / (cs1 + cs2)
+
         P_DEC = 1 - P_KO - P_SUB
 
         # Αναλυτικές πιθανότητες
