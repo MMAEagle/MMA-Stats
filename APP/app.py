@@ -624,7 +624,7 @@ elif st.session_state["page"] == "outcome":
         f2_score = finish_scores2["KO Win Score"] + finish_scores2["SUB Win Score"] + finish_scores2["KO Loss Score"] + finish_scores2["SUB Loss Score"]
 
         # Υπολογισμός πιθανότητας
-        finish_prop = 0.25 * cs1 * f1_score + 0.25 * cs2 * f2_score
+        finish_prop = (0.25 * cs1 * f1_score + 0.25 * cs2 * f2_score)/(cs1 + cs2)
         finish_prop = min(max(finish_prop, 0), 1)  # Clamp μεταξύ 0-1
         dec_prop = 1 - finish_prop
 
