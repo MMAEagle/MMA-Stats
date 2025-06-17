@@ -11,6 +11,7 @@ sheet = "App"
 
 custom_columns = [
     "Fighter", "Age", "Height", "Reach",
+    "MMA WINS", "MMA LOSSES",
     "UFC WINS", "UFC LOSSES",
     "KO Wins%", "KO Losses%", "SUB Wins%", "SUB Losses%",
     "DEC Wins%", "DEC Losses%", "Sig Strikes Landed", "Sig Strikes Absorbed",
@@ -155,6 +156,7 @@ if st.session_state.page == "main":
         st.markdown(f"- 🔁 Streak: {fighter_data['Streak']}")
 
         st.markdown("**__ΡΕΚΟΡ__**")
+        st.markdown(f"- 🧾 **MMA Record:** ✅ {int(fighter_data['MMA WINS'])}  ❌ {int(fighter_data['MMA LOSSES'])}")
         st.markdown(f"- 🧾 **UFC Record:** ✅ {int(fighter_data['UFC WINS'])}  ❌ {int(fighter_data['UFC LOSSES'])}")
 
 
