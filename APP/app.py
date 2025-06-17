@@ -397,6 +397,7 @@ elif st.session_state.page == "winner" and st.session_state["winner_ready"]:
     st.markdown(f"<h1 style='text-align: center;'>🏆 {winner}</h1>", unsafe_allow_html=True)
     st.markdown(f"<h4 style='text-align: center;'>({prob1}% vs {prob2}%)</h4>", unsafe_allow_html=True)
 
+    # ➕ Δημιουργία Παρολί
     if len(st.session_state.multi_fights) < 5:
         if st.button("➕ ΔΗΜΙΟΥΡΓΙΑ ΠΑΡΟΛΙ"):
             st.session_state.multi_fights.append({
@@ -408,24 +409,22 @@ elif st.session_state.page == "winner" and st.session_state["winner_ready"]:
             st.session_state.page = "multi_fight"
             st.rerun()
 
-    if st.button("🔙 ΕΠΙΣΤΡΟΦΗ ΣΤΗΝ ΑΡΧΙΚΗ"):
-        st.session_state.page = "main"
-        st.rerun()
-
     if st.button("📈 Υπολογισμός Value"):
         st.session_state.page = "value"
         st.rerun()
 
-    # ➕ ΝΕΟ SECTION: Συνδυασμός Νικητή και Μεθόδου
+    if st.button("🔙 Επιστροφή στην αρχική"):
+        st.session_state.page = "main"
+        st.rerun()
+
+    # ➕ Συνδυασμός Νικητή και Μεθόδου
     with st.expander("🎯 Συνδυασμός Νικητή και Μεθόδου"):
         selected_fighter = st.selectbox("👤 Επίλεξε Νικητή", [f1["Fighter"], f2["Fighter"]])
         method = st.radio("⚔️ Επιλογή Μεθόδου Νίκης", ["🥊 KO ή 🧠 Υποταγή", "⚖️ Απόφαση"])
 
-        # Υπολογισμός επιμέρους scores για τους δύο μαχητές
         scores_f1 = calculate_finish_scores(f1)
         scores_f2 = calculate_finish_scores(f2)
 
-        # Πιθανότητες νίκης κάθε μαχητή
         p_win_f1 = prob1 / 100
         p_win_f2 = prob2 / 100
 
@@ -448,85 +447,13 @@ elif st.session_state.page == "winner" and st.session_state["winner_ready"]:
                 scores_f2["DEC Win Score"] + scores_f1["DEC Loss Score"]
             ) * 0.5
 
-        if method == "🥊 KO ή 🧠 Υποταγή":
-            result_prob = p_win * ko_sub_score
-        else:
-            result_prob = p_win * dec_score
+        result_prob = p_win * ko_sub_score if method == "🥊 KO ή 🧠 Υποταγή" else p_win * dec_score
 
         st.markdown("---")
-        st.markdown(f"### 📊 Πιθανότητα για **{selected_fighter}** να νικήσει με **{method}**: ")
+        st.markdown(f"### 📊 Πιθανότητα για **{selected_fighter}** να νικήσει με **{method}**:")
         st.markdown(f"<h2 style='text-align: center; color: green;'>{round(result_prob * 100, 2)}%</h2>", unsafe_allow_html=True)
 
-    
-    col1, col2 = st.columns(2)
 
-    with col1:
-        st.session_state.current_pair["f1"] = st.selectbox("🧍 Μαχητής 1", df["Fighter"], key="mf_f1")
-    with col2:
-        st.session_state.current_pair["f2"] = st.selectbox("🧍 Μαχητής 2", df["Fighter"], key="mf_f2")
-
-    if st.session_state.current_pair["f1"] == st.session_state.current_pair["f2"]:
-        st.warning("⚠️ Οι δύο μαχητές πρέπει να είναι διαφορετικοί.")
-    else:
-        winner_manual = st.selectbox(
-            "🏆 Επιλέξτε νικητή", 
-            [st.session_state.current_pair["f1"], st.session_state.current_pair["f2"]],
-            key="mf_winner_manual"
-        )
-        if st.button("🧾 ΠΡΟΣΘΗΚΗ ΣΤΟ ΠΑΡΟΛΙ"):
-            f1 = df[df["Fighter"] == st.session_state.current_pair["f1"]].iloc[0]
-            f2 = df[df["Fighter"] == st.session_state.current_pair["f2"]].iloc[0]
-            score1 = calc_custom_score(f1)
-            score2 = calc_custom_score(f2)
-            prob1 = round(score1 / (score1 + score2) * 100, 1)
-            prob2 = round(score2 / (score1 + score2) * 100, 1)
-            winner = winner_manual
-            prob = prob1 if winner == f1["Fighter"] else prob2
-    
-            st.session_state.multi_fights.append({
-                "f1": f1["Fighter"],
-                "f2": f2["Fighter"],
-                "winner": winner,
-                "prob": prob
-            })
-    
-            st.success(f"✅ Προστέθηκε: {winner} ({prob}%)")
-
-
-    if st.session_state.multi_fights:
-        st.markdown("### 🧾 Προβλέψεις Παρολί")
-        total_prob = 1
-        for idx, fight in enumerate(st.session_state.multi_fights, 1):
-            st.markdown(f"**{idx}. {fight['f1']} vs {fight['f2']} → 🏆 {fight['winner']} ({fight['prob']}%)**")
-            total_prob *= (fight["prob"] / 100)
-
-        total_prob_percent = round(total_prob * 100, 2)
-        fair_odds = round(100 / total_prob_percent, 2)
-        
-        st.markdown(f"""
-        <div style='
-            background-color: #1e1e1e;
-            color: #f0f0f0;
-            border: 1px solid #444;
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 20px;
-        '>
-            <p style='font-size: 18px; margin: 0;'><strong>🔢 Συνολικό Παρολί:</strong> {total_prob_percent}%</p>
-            <p style='font-size: 16px; margin: 8px 0 0;'>🎯 Value αν απόδοση &gt; <strong>{fair_odds}</strong></p>
-        </div>
-        """, unsafe_allow_html=True)
-
-
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("🔙 Επιστροφή στην αρχική"):
-            st.session_state.page = "main"
-            st.rerun()
-    with col2:
-        if st.button("🧹 Καθαρισμός Παρολί"):
-            st.session_state.multi_fights = []
-            st.rerun()
 
 
    # ------- VALUE BET --------
