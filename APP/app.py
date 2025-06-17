@@ -617,17 +617,18 @@ elif st.session_state["page"] == "outcome":
         finish_scores1 = calculate_finish_scores(fighter1)
         finish_scores2 = calculate_finish_scores(fighter2)
 
-        # Πιθανοτητες εκβασης με βαση και τους 2 μαχητες
         P_KO = (cs1 * finish_scores1["KO Win Score"] + cs2 * finish_scores2["KO Win Score"]) / (cs1 + cs2)
         P_SUB = (cs1 * finish_scores1["SUB Win Score"] + cs2 * finish_scores2["SUB Win Score"]) / (cs1 + cs2)
         P_DEC = 1 - P_KO - P_SUB
 
-        st.markdown("### 🎯 <b>Αναλυτικές Πιθανότητες Τρόπου Εκβασης</b>", unsafe_allow_html=True)
-        st.markdown(f"<h4>🥊 KO/TKO: <b>{round(P_KO*100, 1)}%</b></h4>", unsafe_allow_html=True)
-        st.markdown(f"<h4>🤼‍♂️ Υποταγή: <b>{round(P_SUB*100, 1)}%</b></h4>", unsafe_allow_html=True)
-        st.markdown(f"<h4>📜 Απόφαση: <b>{round(P_DEC*100, 1)}%</b></h4>", unsafe_allow_html=True)
+        # Αναλυτικές πιθανότητες
+        st.markdown("### 🎯 <b>Αναλυτικές Πιθανότητες Τρόπου Εκβασης</b><br><br>", unsafe_allow_html=True)
 
-        # ΝΕΟ ΚΟΥΜΠΙ ΓΙΑ VALUE
+        st.markdown(f"<p style='font-size:20px;'>🥊 <b>KO/TKO:</b> {round(P_KO*100, 1)}%</p>", unsafe_allow_html=True)
+        st.markdown(f"<p style='font-size:20px;'>🤼‍♂️ <b>Υποταγή:</b> {round(P_SUB*100, 1)}%</p>", unsafe_allow_html=True)
+        st.markdown(f"<p style='font-size:20px;'>📜 <b>Απόφαση:</b> {round(P_DEC*100, 1)}%</p>", unsafe_allow_html=True)
+
+        # Νέο tab για value αποδόσεις
         with st.expander("📊 Value αποδόσεις"):
             if P_KO + P_SUB > 0:
                 val_finish_odds = round(1 / (P_KO + P_SUB), 2)
