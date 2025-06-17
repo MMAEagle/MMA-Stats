@@ -408,7 +408,6 @@ elif st.session_state.page == "winner" and st.session_state["winner_ready"]:
             st.session_state.page = "multi_fight"
             st.rerun()
 
-
     if st.button("🔙 ΕΠΙΣΤΡΟΦΗ ΣΤΗΝ ΑΡΧΙΚΗ"):
         st.session_state.page = "main"
         st.rerun()
@@ -417,11 +416,47 @@ elif st.session_state.page == "winner" and st.session_state["winner_ready"]:
         st.session_state.page = "value"
         st.rerun()
 
-#-------Παρολι--------
-elif st.session_state.page == "multi_fight":
-    st.title("📋 Νέο Fight για Παρολί")
+    # ➕ ΝΕΟ SECTION: Συνδυασμός Νικητή και Μεθόδου
+    with st.expander("🎯 Συνδυασμός Νικητή και Μεθόδου"):
+        selected_fighter = st.selectbox("👤 Επίλεξε Νικητή", [f1["Fighter"], f2["Fighter"]])
+        method = st.radio("⚔️ Επιλογή Μεθόδου Νίκης", ["🥊 KO ή 🧠 Υποταγή", "⚖️ Απόφαση"])
 
-    col1, col2 = st.columns(2)
+        # Υπολογισμός επιμέρους scores για τους δύο μαχητές
+        scores_f1 = calculate_finish_scores(f1)
+        scores_f2 = calculate_finish_scores(f2)
+
+        # Πιθανότητες νίκης κάθε μαχητή
+        p_win_f1 = prob1 / 100
+        p_win_f2 = prob2 / 100
+
+        if selected_fighter == f1["Fighter"]:
+            p_win = p_win_f1
+            ko_sub_score = (
+                scores_f1["KO Win Score"] + scores_f2["KO Loss Score"] +
+                scores_f1["SUB Win Score"] + scores_f2["SUB Loss Score"]
+            ) * 0.25
+            dec_score = (
+                scores_f1["DEC Win Score"] + scores_f2["DEC Loss Score"]
+            ) * 0.5
+        else:
+            p_win = p_win_f2
+            ko_sub_score = (
+                scores_f2["KO Win Score"] + scores_f1["KO Loss Score"] +
+                scores_f2["SUB Win Score"] + scores_f1["SUB Loss Score"]
+            ) * 0.25
+            dec_score = (
+                scores_f2["DEC Win Score"] + scores_f1["DEC Loss Score"]
+            ) * 0.5
+
+        if method == "🥊 KO ή 🧠 Υποταγή":
+            result_prob = p_win * ko_sub_score
+        else:
+            result_prob = p_win * dec_score
+
+        st.markdown("---")
+        st.markdown(f"### 📊 Πιθανότητα για **{selected_fighter}** να νικήσει με **{method}**: ")
+        st.markdown(f"<h2 style='text-align: center; color: green;'>{round(result_prob * 100, 2)}%</h2>", unsafe_allow_html=True)
+
     with col1:
         st.session_state.current_pair["f1"] = st.selectbox("🧍 Μαχητής 1", df["Fighter"], key="mf_f1")
     with col2:
