@@ -433,7 +433,7 @@ elif st.session_state.page == "winner" and st.session_state["winner_ready"]:
             ko_sub_score = (
                 scores_f1["KO Win Score"] + scores_f2["KO Loss Score"] +
                 scores_f1["SUB Win Score"] + scores_f2["SUB Loss Score"]
-            ) * 0.25
+            ) * 0.5
             dec_score = (
                 scores_f1["DEC Win Score"] + scores_f2["DEC Loss Score"]
             ) * 0.5
