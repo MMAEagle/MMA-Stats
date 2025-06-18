@@ -542,6 +542,9 @@ elif st.session_state.page == "history":
     history_folder = "APP"
     history_files = [f for f in os.listdir(history_folder) if f.endswith(".xlsx") and f != "002 Stats.xlsx"]
 
+    total_correct = 0
+    total_predictions = 0
+
     if not history_files:
         st.info("Δεν υπάρχουν αποθηκευμένες προβλέψεις.")
     else:
@@ -552,7 +555,7 @@ elif st.session_state.page == "history":
                     hist_df = pd.read_excel(file_path)
                     required_cols = ["Fighter 1", "Fighter 2", "Prediction", "Winner"]
                     if set(required_cols).issubset(hist_df.columns):
-                        
+
                         # Προσθήκη στήλης με ✔️ ή ❌
                         hist_df["✅"] = hist_df.apply(
                             lambda row: "✔️" if row["Prediction"] == row["Winner"] else "❌", axis=1
@@ -561,25 +564,35 @@ elif st.session_state.page == "history":
                         # Εμφάνιση πίνακα
                         st.dataframe(hist_df)
 
-                        # Υπολογισμός ποσοστού επιτυχίας
+                        # Υπολογισμός ποσοστού επιτυχίας για το αρχείο
                         correct = (hist_df["Prediction"] == hist_df["Winner"]).sum()
                         total = len(hist_df)
                         accuracy = correct / total * 100 if total > 0 else 0
                         st.markdown(f"**🎯 Ποσοστό επιτυχίας:** `{accuracy:.2f}%`")
+
+                        # Προσθήκη στα συνολικά
+                        total_correct += correct
+                        total_predictions += total
                     else:
                         st.warning(f"Το αρχείο '{file}' δεν έχει τη σωστή μορφή.")
                 except Exception as e:
                     st.error(f"Σφάλμα στο άνοιγμα του αρχείου '{file}': {e}")
 
-    if st.button("🔙 Επιστροφή"):
-        st.session_state.page = "main"
-        st.rerun()
-  
-    
+        # Υπολογισμός συνολικού ποσοστού επιτυχίας
+        if total_predictions > 0:
+            total_accuracy = total_correct / total_predictions * 100
+            color = "green" if total_accuracy > 50 else "red"
+            st.markdown(
+                f"<h4>📊 Συνολικό Ποσοστό Επιτυχίας: "
+                f"<span style='color:{color}'>{total_accuracy:.2f}%</span></h4>",
+                unsafe_allow_html=True
+            )
+
     # Επιστροφή στην αρχική σελίδα
     if st.button("🔙 Επιστροφή στην αρχική"):
         st.session_state.page = "main"
         st.rerun()
+
 # ----------------ΤΡΟΠΟΣ ΕΚΒΑΣΗΣ--------------
 
 elif st.session_state["page"] == "outcome":
