@@ -162,8 +162,10 @@ if st.session_state.page == "main":
                 <li> <b>ΕΞΑΓΩΓΗ ΣΥΜΠΕΡΑΣΜΑΤΩΝ</b>: Εκεί μπορείς να δείς τα συμπεράσματα που προκύπτουν από την σύγκριση των δύο μαχητών που επέλεξες. </li>
                 <li> <b>ΕΞΑΓΩΓΗ ΝΙΚΗΤΗ</b>: Μπορείς να το επιλέξεις είτε από την <b>Αρχική Σελίδα</b> είτε από την σελίδα <b>Εξαγωγή Συμπερασμάτων</b> για αυτόματη πρόβλεψη νικητή. Εκεί θα δείς τον νικητή που προβλέπει η εφαρμογή με τις πιθανότητες νίκης. Εκεί έχεις τις παρακάτω επιλογές</li>
                 <li> <b>1) ΔΗΜΙΟΥΡΓΙΑ ΠΑΡΟΛΙ</b>: Ακολουθείς την διαδικασία που αναλύθηκε πιο πάνω.</li>
-                <li> <b>Υπολογισμός Value</b>: Εκεί μπορείς να τοποθετήσεις τις αποδόσεις που έχεις βρεί σε κάποια στοιχηματική και να δείς εάν αξίζει κάποιος μαχητής για στοιχηματισμό. Πολύ πιθανόν να μην αξίζει κάποιος μαχητής για στοιχηματισμό!!</li>
+                <li> <b>Υπολογισμός Value</b>: Εκεί μπορείς να τοποθετήσεις τις αποδόσεις που έχεις βρεί σε κάποια στοιχηματική και να δείς εάν αξίζει κάποιος μαχητής για στοιχηματισμό. Δεν είναι απαραίτητο να υπάρχει Value μόνο στον νικητή με τις περισσότερες πιθανότηες. Πολύ πιθανόν να μην αξίζει κάποιος μαχητής για στοιχηματισμό!!</li>
+                <li> <b>Συνδυασμός νικητή και μεθόδου</b>: Εκεί μπορείς να επιλέξει έναν από τους δύο μαχητές που έχεις συγκρίνει και στη συνέχεια να επιλέξεις τον τρόπο με τον οποίο πιστεύεις ότι θα νικήσει. Από κάτω θα σου εμφανίσει την απόδοση να συμβεί αυτο και την ελάχιστη Value απόδοση</li>
                 <li>Χρησιμοποίησε το μενού πάνω δεξιά για να δεις ιστορικό ή συμπεράσματα.</li>
+                <li> Σε κάθε σελίδα θα βρείς το κουμπί <b>Επιστροφή στην αρχική</b>.</li>
             </ul>
         </div>
         """, unsafe_allow_html=True)
@@ -401,20 +403,33 @@ elif st.session_state.page == "winner" and st.session_state["winner_ready"]:
     st.markdown(f"<h4 style='text-align: center;'>({prob1}% vs {prob2}%)</h4>", unsafe_allow_html=True)
 
     # ➕ Δημιουργία Παρολί
-    if len(st.session_state.multi_fights) < 5:
-        if st.button("➕ ΔΗΜΙΟΥΡΓΙΑ ΠΑΡΟΛΙ"):
-            st.session_state.multi_fights.append({
-                "f1": st.session_state["f1"],
-                "f2": st.session_state["f2"],
-                "winner": winner,
-                "prob": prob1 if winner == f1["Fighter"] else prob2
-            })
-            st.session_state.page = "multi_fight"
-            st.rerun()
+if len(st.session_state.multi_fights) < 5:
+    if st.button("➕ Προσθήκη στο Παρολί"):
+        st.session_state.multi_fights.append({
+            "f1": st.session_state["f1"],
+            "f2": st.session_state["f2"],
+            "winner": winner,
+            "prob": prob1 if winner == f1["Fighter"] else prob2
+        })
+        st.success("✅ Ο αγώνας προστέθηκε στο παρολί.")
 
+    # Dropdown/Expander εμφάνισης παρολί
+    if st.session_state.multi_fights:
+        import pandas as pd
+        with st.expander("📋 Προβολή Παρολί", expanded=False):
+            df_multi = pd.DataFrame(st.session_state.multi_fights)
+            st.dataframe(df_multi)
+    
+            # Προαιρετικά κουμπιά διαχείρισης
+            if st.button("🗑️ Καθαρισμός Παρολί"):
+                st.session_state.multi_fights = []
+                st.success("Το παρολί καθαρίστηκε.")
+    
+    # Υπολογισμός Value Bet (μένει στην ίδια σελίδα)
     if st.button("📈 Υπολογισμός Value"):
         st.session_state.page = "value"
         st.rerun()
+
 
 
     # ➕ Συνδυασμός Νικητή και Μεθόδου
