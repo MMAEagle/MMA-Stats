@@ -462,7 +462,10 @@ elif st.session_state.page == "winner" and st.session_state["winner_ready"]:
             f"</p>", 
             unsafe_allow_html=True
         )
-
+        
+    if st.button("📈 Υπολογισμός Value"):
+        st.session_state.page = "value"
+        st.rerun()
 
 
     if st.button("🔙 Επιστροφή στην αρχική"):
