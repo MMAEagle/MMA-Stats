@@ -413,24 +413,6 @@ if len(st.session_state.multi_fights) < 5:
         })
         st.success("✅ Ο αγώνας προστέθηκε στο παρολί.")
 
-    # Dropdown/Expander εμφάνισης παρολί
-    if st.session_state.multi_fights:
-        import pandas as pd
-        with st.expander("📋 Προβολή Παρολί", expanded=False):
-            df_multi = pd.DataFrame(st.session_state.multi_fights)
-            st.dataframe(df_multi)
-    
-            # Προαιρετικά κουμπιά διαχείρισης
-            if st.button("🗑️ Καθαρισμός Παρολί"):
-                st.session_state.multi_fights = []
-                st.success("Το παρολί καθαρίστηκε.")
-    
-    # Υπολογισμός Value Bet (μένει στην ίδια σελίδα)
-    if st.button("📈 Υπολογισμός Value"):
-        st.session_state.page = "value"
-        st.rerun()
-
-
 
     # ➕ Συνδυασμός Νικητή και Μεθόδου
     with st.expander("🎯 Συνδυασμός Νικητή και Μεθόδου"):
