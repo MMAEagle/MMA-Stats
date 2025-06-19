@@ -446,12 +446,15 @@ elif st.session_state.page == "winner" and st.session_state["winner_ready"]:
     
                 st.success(f"✅ Προστέθηκε: {winner} ({prob}%)")
     
+                # Ορίζουμε το flag για rerun, ΔΕΝ καλούμε άμεσα st.experimental_rerun()
                 st.session_state['rerun_flag'] = True
-
+    
+    # Εκτός κουμπιών, ελέγχουμε το flag και κάνουμε rerun μία φορά
     if st.session_state.get('rerun_flag', False):
         st.session_state['rerun_flag'] = False
         st.experimental_rerun()
     
+    # Συνεχίζουμε με εμφάνιση λίστας αγώνων κλπ
     if st.session_state.multi_fights:
         total_prob = 1
         indices_to_remove = []
@@ -490,7 +493,6 @@ elif st.session_state.page == "winner" and st.session_state["winner_ready"]:
             <p style='font-size: 16px; margin: 8px 0 0;'>🎯 Value αν απόδοση &gt; <strong>{fair_odds}</strong></p>
         </div>
         """, unsafe_allow_html=True)
-    
 
 
     # ➕ Συνδυασμός Νικητή και Μεθόδου
