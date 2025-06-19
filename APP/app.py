@@ -406,93 +406,15 @@ elif st.session_state.page == "winner" and st.session_state["winner_ready"]:
     st.markdown(f"<h4 style='text-align: center;'>({prob1}% vs {prob2}%)</h4>", unsafe_allow_html=True)
 
     # ➕ Δημιουργία Παρολί
-    with st.expander("📋 Διαχείριση Παρολί & Προσθήκη νέου αγώνα", expanded=True):
-
-        col1, col2 = st.columns(2)
-        with col1:
-            selected_f1 = st.selectbox("🧍 Μαχητής 1", df["Fighter"], key="exp_f1")
-        with col2:
-            selected_f2 = st.selectbox("🧍 Μαχητής 2", df["Fighter"], key="exp_f2")
-    
-        if selected_f1 == selected_f2:
-            st.warning("⚠️ Οι δύο μαχητές πρέπει να είναι διαφορετικοί.")
-        else:
-            winner_manual = st.selectbox(
-                "🏆 Επιλέξτε νικητή",
-                [selected_f1, selected_f2],
-                key="exp_winner_manual"
-            )
-    
-            if st.button("🧾 Προσθήκη στο Παρολί", key="exp_add_to_paroli"):
-    
-                f1 = df[df["Fighter"] == selected_f1].iloc[0]
-                f2 = df[df["Fighter"] == selected_f2].iloc[0]
-    
-                score1 = calc_custom_score(f1)
-                score2 = calc_custom_score(f2)
-    
-                prob1 = round(score1 / (score1 + score2) * 100, 1)
-                prob2 = round(score2 / (score1 + score2) * 100, 1)
-    
-                winner = winner_manual
-                prob = prob1 if winner == f1["Fighter"] else prob2
-    
-                st.session_state.multi_fights.append({
-                    "f1": f1["Fighter"],
-                    "f2": f2["Fighter"],
-                    "winner": winner,
-                    "prob": prob
-                })
-    
-                st.success(f"✅ Προστέθηκε: {winner} ({prob}%)")
-    
-                # Ορίζουμε το flag για rerun, ΔΕΝ καλούμε άμεσα st.experimental_rerun()
-                st.session_state['rerun_flag'] = True
-    
-    # Εκτός κουμπιών, ελέγχουμε το flag και κάνουμε rerun μία φορά
-    if st.session_state.get('rerun_flag', False):
-        st.session_state['rerun_flag'] = False
-        st.experimental_rerun()
-    
-    # Συνεχίζουμε με εμφάνιση λίστας αγώνων κλπ
-    if st.session_state.multi_fights:
-        total_prob = 1
-        indices_to_remove = []
-    
-        for idx, fight in enumerate(st.session_state.multi_fights):
-            col1, col2 = st.columns([4, 1])
-            with col1:
-                st.markdown(
-                    f"**{idx+1}. {fight['f1']} vs {fight['f2']} → 🏆 {fight['winner']} ({fight['prob']}%)**"
-                )
-            with col2:
-                if st.button("❌", key=f"remove_{idx}"):
-                    indices_to_remove.append(idx)
-    
-        if indices_to_remove:
-            for idx in sorted(indices_to_remove, reverse=True):
-                del st.session_state.multi_fights[idx]
-            st.experimental_rerun()
-    
-        for fight in st.session_state.multi_fights:
-            total_prob *= (fight["prob"] / 100)
-    
-        total_prob_percent = round(total_prob * 100, 2)
-        fair_odds = round(100 / total_prob_percent, 2)
-    
-        st.markdown(f"""
-        <div style='
-            background-color: #1e1e1e;
-            color: #f0f0f0;
-            border: 1px solid #444;
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 20px;
-        '>
-            <p style='font-size: 18px; margin: 0;'><strong>🔢 Συνολικό Παρολί:</strong> {total_prob_percent}%</p>
-            <p style='font-size: 16px; margin: 8px 0 0;'>🎯 Value αν απόδοση &gt; <strong>{fair_odds}</strong></p>
-        </div>
-        """, unsafe_allow_html=True)
+    if len(st.session_state.multi_fights) < 5:
+        if st.button("➕ Προσθήκη στο Παρολί"):
+            st.session_state.multi_fights.append({
+                "f1": st.session_state["f1"],
+                "f2": st.session_state["f2"],
+                "winner": winner,
+                "prob": prob1 if winner == f1["Fighter"] else prob2
+            })
+            st.success("✅ Ο αγώνας προστέθηκε στο παρολί.")
 
 
     # ➕ Συνδυασμός Νικητή και Μεθόδου
