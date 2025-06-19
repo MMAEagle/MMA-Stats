@@ -415,7 +415,7 @@ elif st.session_state.page == "winner" and st.session_state["winner_ready"]:
         prob2 = round(score2 / (score1 + score2) * 100, 1)
         winner = f1["Fighter"] if score1 > score2 else f2["Fighter"]
         prob = prob1 if winner == f1["Fighter"] else prob2
-
+    
         st.session_state.multi_fights.append({
             "f1": f1["Fighter"],
             "f2": f2["Fighter"],
@@ -423,7 +423,8 @@ elif st.session_state.page == "winner" and st.session_state["winner_ready"]:
             "prob": prob
         })
         st.session_state.page = "multi_fight"
-        st.rerun()
+        st.experimental_rerun()
+
             
     # ➕ Συνδυασμός Νικητή και Μεθόδου
     with st.expander("🎯 Συνδυασμός Νικητή και Μεθόδου"):
