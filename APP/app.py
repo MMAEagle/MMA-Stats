@@ -408,13 +408,9 @@ elif st.session_state.page == "winner" and st.session_state["winner_ready"]:
     # ➕ Δημιουργία Παρολί
     if len(st.session_state.multi_fights) < 5:
         if st.button("➕ Προσθήκη στο Παρολί"):
-            st.session_state.multi_fights.append({
-                "f1": st.session_state["f1"],
-                "f2": st.session_state["f2"],
-                "winner": winner,
-                "prob": prob1 if winner == f1["Fighter"] else prob2
-            })
-            st.success("✅ Ο αγώνας προστέθηκε στο παρολί.")
+            st.session_state.page = "multi_fight"
+            st.experimental_rerun()
+
 
 
     # ➕ Συνδυασμός Νικητή και Μεθόδου
