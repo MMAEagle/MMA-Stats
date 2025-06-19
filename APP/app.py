@@ -406,10 +406,24 @@ elif st.session_state.page == "winner" and st.session_state["winner_ready"]:
     st.markdown(f"<h4 style='text-align: center;'>({prob1}% vs {prob2}%)</h4>", unsafe_allow_html=True)
 
     # ➕ Δημιουργία Παρολί
-    if len(st.session_state.multi_fights) < 5:
-        if st.button("➕ Προσθήκη στο Παρολί"):
-            st.session_state.page = "multi_fight"
-            st.experimental_rerun()
+    if st.button("➕ ΔΗΜΙΟΥΡΓΙΑ ΠΑΡΟΛΙ", use_container_width=True):
+        f1 = df[df["Fighter"] == st.session_state.f1].iloc[0]
+        f2 = df[df["Fighter"] == st.session_state.f2].iloc[0]
+        score1 = calc_custom_score(f1)
+        score2 = calc_custom_score(f2)
+        prob1 = round(score1 / (score1 + score2) * 100, 1)
+        prob2 = round(score2 / (score1 + score2) * 100, 1)
+        winner = f1["Fighter"] if score1 > score2 else f2["Fighter"]
+        prob = prob1 if winner == f1["Fighter"] else prob2
+
+        st.session_state.multi_fights.append({
+            "f1": f1["Fighter"],
+            "f2": f2["Fighter"],
+            "winner": winner,
+            "prob": prob
+        })
+        st.session_state.page = "multi_fight"
+        st.rerun()
             
     # ➕ Συνδυασμός Νικητή και Μεθόδου
     with st.expander("🎯 Συνδυασμός Νικητή και Μεθόδου"):
