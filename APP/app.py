@@ -514,46 +514,46 @@ elif st.session_state.page == "multi_fight":
 
 
     if st.session_state.multi_fights:
-    st.markdown("### 🧾 Προβλέψεις Παρολί")
-    total_prob = 1
-    indices_to_remove = []
-
-    for idx, fight in enumerate(st.session_state.multi_fights):
-        col1, col2 = st.columns([4, 1])
-        with col1:
-            st.markdown(
-                f"**{idx+1}. {fight['f1']} vs {fight['f2']} → 🏆 {fight['winner']} ({fight['prob']}%)**"
-            )
-        with col2:
-            if st.button("❌", key=f"remove_{idx}"):
-                indices_to_remove.append(idx)
-
-    # Αφαιρούμε ματς που ζητήθηκαν
-    for idx in sorted(indices_to_remove, reverse=True):
-        del st.session_state.multi_fights[idx]
-        st.rerun()
-
-    # Αν παραμένουν επιλογές, υπολόγισε συνολικό
-    if st.session_state.multi_fights:
-        for fight in st.session_state.multi_fights:
-            total_prob *= (fight["prob"] / 100)
-
-        total_prob_percent = round(total_prob * 100, 2)
-        fair_odds = round(100 / total_prob_percent, 2)
-
-        st.markdown(f"""
-        <div style='
-            background-color: #1e1e1e;
-            color: #f0f0f0;
-            border: 1px solid #444;
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 20px;
-        '>
-            <p style='font-size: 18px; margin: 0;'><strong>🔢 Συνολικό Παρολί:</strong> {total_prob_percent}%</p>
-            <p style='font-size: 16px; margin: 8px 0 0;'>🎯 Value αν απόδοση &gt; <strong>{fair_odds}</strong></p>
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown("### 🧾 Προβλέψεις Παρολί")
+        total_prob = 1
+        indices_to_remove = []
+    
+        for idx, fight in enumerate(st.session_state.multi_fights):
+            col1, col2 = st.columns([4, 1])
+            with col1:
+                st.markdown(
+                    f"**{idx+1}. {fight['f1']} vs {fight['f2']} → 🏆 {fight['winner']} ({fight['prob']}%)**"
+                )
+            with col2:
+                if st.button("❌", key=f"remove_{idx}"):
+                    indices_to_remove.append(idx)
+    
+        # Αφαιρούμε ματς που ζητήθηκαν
+        for idx in sorted(indices_to_remove, reverse=True):
+            del st.session_state.multi_fights[idx]
+            st.rerun()
+    
+        # Αν παραμένουν επιλογές, υπολόγισε συνολικό
+        if st.session_state.multi_fights:
+            for fight in st.session_state.multi_fights:
+                total_prob *= (fight["prob"] / 100)
+    
+            total_prob_percent = round(total_prob * 100, 2)
+            fair_odds = round(100 / total_prob_percent, 2)
+    
+            st.markdown(f"""
+            <div style='
+                background-color: #1e1e1e;
+                color: #f0f0f0;
+                border: 1px solid #444;
+                border-radius: 10px;
+                padding: 15px;
+                margin-top: 20px;
+            '>
+                <p style='font-size: 18px; margin: 0;'><strong>🔢 Συνολικό Παρολί:</strong> {total_prob_percent}%</p>
+                <p style='font-size: 16px; margin: 8px 0 0;'>🎯 Value αν απόδοση &gt; <strong>{fair_odds}</strong></p>
+            </div>
+            """, unsafe_allow_html=True)
 
 
 
