@@ -409,10 +409,7 @@ elif st.session_state.page == "winner" and st.session_state["winner_ready"]:
     if len(st.session_state.multi_fights) < 5:
         if st.button("➕ Προσθήκη στο Παρολί"):
             st.session_state.page = "multi_fight"
-            st.experimental_rerun()
-
-
-
+            
     # ➕ Συνδυασμός Νικητή και Μεθόδου
     with st.expander("🎯 Συνδυασμός Νικητή και Μεθόδου"):
         selected_fighter = st.selectbox("👤 Επίλεξε Νικητή", [f1["Fighter"], f2["Fighter"]])
