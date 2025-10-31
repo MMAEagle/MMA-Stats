@@ -115,6 +115,10 @@ percent_cols = [
 
 
 for col in percent_cols:
+    # Μετατροπή σε αριθμό - μη αριθμοί γίνονται NaN
+    df[col] = pd.to_numeric(df[col], errors='coerce')
+    
+    # Πολλαπλασιασμός με 100 και στρογγυλοποίηση
     df[col] = (df[col] * 100).round(1)
 
 for col in ["Control Time (sec)", "Controlled Time (sec)", "Fight Time (sec)"]:
@@ -751,3 +755,4 @@ elif st.session_state["page"] == "outcome":
 
         st.markdown("---")
         st.button("🔙 Επιστροφή", on_click=lambda: st.session_state.update({"page": "main"}))
+
